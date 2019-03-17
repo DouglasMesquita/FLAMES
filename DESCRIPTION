@@ -1,0 +1,18 @@
+Package: tbreg
+Type: Package
+Title: Binary regression for a new class of tobit link functions
+Version: 0.1.0
+Author: Douglas R. M. Azevedo, Marcos O. Prates, Renato M. Assuncao
+Maintainer: Douglas R. M. Azevedo <douglasrm.azevedo@gmail.com>
+Depends: 
+    R (>= 3.5),
+    HI, 
+    progress, 
+    coda
+Imports:
+    methods
+Description: Fit binary regression with several link functions including a possible constant parameter c as: c + (1-c)F^(-1)(p) = Xbeta in which F is a valid cumulative distribution.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1

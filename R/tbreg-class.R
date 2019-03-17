@@ -1,0 +1,22 @@
+#' An object of 'tbreg' class
+#'
+#' @slot p A matrix with estimated probability
+#' @slot beta A matrix with coefficients samples
+#' @slot c A vector with c parameter sample
+#' @slot df A vector with df parameter sample
+#' @slot lambda A vector with lambda parameter sample
+#' @slot time Time elapsed
+#' @slot call Function call
+#'
+#' @importFrom methods new
+#'
+#' @export
+
+tbreg_class <- setClass(Class = 'tbreg',
+                        representation(p = 'matrix',
+                                       beta = 'matrix',
+                                       c = 'numeric',
+                                       df = 'numeric',
+                                       lambda = 'numeric',
+                                       time = 'numeric',
+                                       call = 'call'))
