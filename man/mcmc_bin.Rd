@@ -8,7 +8,7 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
   a_c = 0.01, b_c = 0.01, a_lambda = 0.01, b_lambda = 0.99,
   var_df = 0.04, var_c = 0.02, var_lambda = 0.2, bound_beta,
-  method = "ARMS")
+  method = "ARMS", force_intercept = FALSE)
 }
 \arguments{
 \item{data}{Dataset to be used}
@@ -27,9 +27,9 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 
 \item{sigma_beta}{Variance of beta prior}
 
-\item{a_c}{Shape1 for c prior}
+\item{a_c}{Shape1 for c prior (beta)}
 
-\item{b_c}{Shape2 for c prior}
+\item{b_c}{Shape2 for c prior (beta)}
 
 \item{a_lambda}{Inferior limit for lambda}
 
@@ -82,8 +82,8 @@ if(interactive()){
  ##-- Hyperparameters (prioris)
  sigma_beta <- 100
 
- a_c <- 0.001  ## non informative beta
- b_c <- 0.001  ## non informative beta
+ a_c <- 0.1  ## non informative beta
+ b_c <- 0.1  ## non informative beta
 
  a_lambda <- 0.01
  b_lambda <- 1.00
@@ -107,7 +107,7 @@ if(interactive()){
                      sigma_beta = sigma_beta, a_c = a_c, b_c = b_c,
                      a_lambda = a_lambda, b_lambda = b_lambda,
                      var_df = var_df, bound_beta = bound_beta,
-                     method = "ARMS")
+                     method = "ARMS", force_intercept = TRUE)
 
  ##-- ARMS ~ 45 seconds
  out_met <- mcmc_bin(data = bd, formula = f,
