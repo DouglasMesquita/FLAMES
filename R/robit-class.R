@@ -1,4 +1,4 @@
-#' An object of 'crobit' class
+#' An object of 'robit' class
 #'
 #' @slot p A matrix with estimated probability
 #' @slot beta A matrix with coefficients samples
@@ -12,7 +12,7 @@
 #'
 #' @export
 
-crobit_class <- setClass(Class = 'crobit',
+robit_class <- setClass(Class = 'robit',
                         representation(p = 'matrix',
                                        beta = 'matrix',
                                        c = 'numeric',

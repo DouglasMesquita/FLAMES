@@ -1,13 +1,13 @@
-#' Coefficients for crobit class
+#' Coefficients for robit class
 #'
-#' @param object crobit object to restore the coefficients
+#' @param object robit object to restore the coefficients
 #' @param ... Other parameters for coef
 #'
-#' @method coef crobit
+#' @method coef robit
 #'
 #' @export
 
-coef.crobit <- function(object, ...){
+coef.robit <- function(object, ...){
   coefficients <- colMeans(object$beta)
   return(coefficients)
 }

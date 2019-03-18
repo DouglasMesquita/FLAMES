@@ -1,16 +1,16 @@
-#' Print for crobit class
+#' Print for robit class
 #'
-#' @param x crobit object to print
+#' @param x robit object to print
 #' @param ... Other parameters for print
 #'
-#' @method print crobit
+#' @method print robit
 #'
 #' @export
 
-print.crobit <- function(x, ...){
+print.robit <- function(x, ...){
   cat('Title: \n')
   cat('\n')
   cat('Coefficients:')
   cat('\n')
-  print(coef.crobit(x))
+  print(coef.robit(x))
 }

@@ -1,14 +1,14 @@
-#' Summary for crobit class (coda is necessary)
+#' Summary for robit class (coda is necessary)
 #'
-#' @param object crobit object to summarise
+#' @param object robit object to summarise
 #' @param HPD HPD intervals or quantiles (TRUE or FALSE)
 #' @param ... Other parameters for summary
 #'
-#' @method summary crobit
+#' @method summary robit
 #'
 #' @export
 
-summary.crobit <- function(object, HPD = T, ...){
+summary.robit <- function(object, HPD = T, ...){
 
   ans <- list()
   ans$'Call' <- object$call

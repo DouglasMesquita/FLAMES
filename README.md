@@ -1,12 +1,12 @@
-crobit
+robit
 ======
 
 # Tobit binary regression
 
-To install the package **```crobit```** use the **```install_github()```** function from **```devtools```**.
+To install the package **```robit```** use the **```install_github()```** function from **```devtools```**.
 
 ```{r}
-devtools::install_github('DouglasMesquita/crobit')
-library(crobit)
+devtools::install_github('DouglasMesquita/robit')
+library(robit)
 ?mcmc_bin
 ```

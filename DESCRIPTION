@@ -1,4 +1,4 @@
-Package: crobit
+Package: robit
 Type: Package
 Title: Binary regression for a new class of tobit link functions
 Version: 0.1.0

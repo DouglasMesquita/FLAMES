@@ -1,17 +1,17 @@
-#' Plot for crobit class
+#' Plot for robit class
 #'
-#' @param x crobit object to plot
+#' @param x robit object to plot
 #' @param bty Box style
 #' @param ask To ask for next plot
 #' @param ... Other parameters for plot
 #'
-#' @method plot crobit
+#' @method plot robit
 #'
 #' @import coda
 #'
 #' @export
 
-plot.crobit <- function(x, bty = "l", ask = T, ...){
+plot.robit <- function(x, bty = "l", ask = T, ...){
 
   data <- data.frame(x$beta, c = x$c, df = x$df)
 
