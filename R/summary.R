@@ -32,27 +32,62 @@ summary.robit <- function(object, HPD = T, ...){
   ans$'Coeficients' <- coef_info
 
   if(HPD){
-    hpd_c <- coda::HPDinterval(coda::as.mcmc(object$c))
-    hpd_df <- coda::HPDinterval(coda::as.mcmc(object$df))
+    if(!is.null(object[["c"]])){
+      hpd_c <- coda::HPDinterval(coda::as.mcmc(object$c))
+      hpd_df <- coda::HPDinterval(coda::as.mcmc(object$df))
 
-    other_info <- data.frame('mean' = c(mean(object$c), mean(object$df)),
-                             'std_error' = c(stats::sd(object$c), stats::sd(object$df)),
-                             'lower_95' = c(hpd_c[1],
-                                            hpd_df[1]),
-                             'upper_95' = c(hpd_c[2],
-                                            hpd_df[2]))
+      lower <- c(hpd_c[1], hpd_df[1])
+      upper <- c(hpd_c[2], hpd_df[2])
+
+      mean_vec <- c(mean(object$c), mean(object$df))
+      sd_vec <- c(stats::sd(object$c), stats::sd(object$df))
+    } else{
+      hpd_df <- coda::HPDinterval(coda::as.mcmc(object$df))
+
+      lower <- hpd_df[1]
+      upper <- hpd_df[1]
+
+      mean_vec <- mean(object$df)
+      sd_vec <- stats::sd(object$df)
+    }
+
+    other_info <- data.frame('mean' = mean_vec,
+                             'std_error' = sd_vec,
+                             'lower_95' = lower,
+                             'upper_95' = upper)
   } else{
-    other_info <- data.frame('mean' = c(mean(object$c), mean(object$df)),
-                             'std_error' = c(stats::sd(object$c), stats::sd(object$nu)),
-                             'lower_95' = c(stats::quantile(x = object$c, probs = 0.025),
-                                            stats::quantile(x = object$df, probs = 0.025)),
-                             'upper_95' = c(stats::quantile(x = object$c, probs = 0.975),
-                                            stats::quantile(x = object$df, probs = 0.975)))
+    if(!is.null(object[["c"]])){
+      quantile_c <- stats::quantile(x = object$c, probs = c(0.025, 0.975))
+      quantile_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
+
+      lower <- c(quantile_c[1], quantile_df[1])
+      upper <- c(quantile_c[2], quantile_df[2])
+
+      mean_vec <- c(mean(object$c), mean(object$df))
+      sd_vec <- c(stats::sd(object$c), stats::sd(object$df))
+    } else{
+      quantile_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
+
+      lower <- quantile_df[1]
+      upper <- quantile_df[1]
+
+      mean_vec <- mean(object$df)
+      sd_vec <- stats::sd(object$df)
+    }
+
+    other_info <- data.frame('mean' = mean_vec,
+                             'std_error' = sd_vec,
+                             'lower_95' = lower,
+                             'upper_95' = upper)
   }
 
-  rownames(other_info) <- c("c parameter", "Degrees of freedom")
-  ans$'Other parameters' <- other_info
+  if(!is.null(object[["c"]])){
+    rownames(other_info) <- c("c parameter", "Degrees of freedom")
+  } else{
+    rownames(other_info) <- "Degrees of freedom"
+  }
 
+  ans$'Other parameters' <- other_info
   ans$'Fit measures' <- object$fit_measures
 
   return(ans)
