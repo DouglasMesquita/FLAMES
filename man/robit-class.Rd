@@ -24,5 +24,7 @@ An object of 'robit' class
 \item{\code{time}}{Time elapsed}
 
 \item{\code{call}}{Function call}
+
+\item{\code{fit_measures}}{DIC, -2*LPML and WAIC measures}
 }}
 

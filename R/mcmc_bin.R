@@ -206,10 +206,13 @@ mcmc_bin <- function(data, formula,
 
   colnames(p_beta) <- colnames(X)
 
+  fit <- fit_measures(y = y, p = as.matrix(p_df))
+
   out <- list(p = p_prop, beta = p_beta,
               c = p_c, df = p_df, lambda = p_lambda,
               time = time_elapsed,
-              call = call_robit)
+              call = call_robit,
+              fit_measures = fit)
 
   class(out) <- "robit"
 

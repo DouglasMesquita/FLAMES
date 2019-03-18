@@ -243,6 +243,95 @@ make_p <- function(X, p_beta, p_c, p_df, inv_link_f){
   return(out)
 }
 
+#' @title Conditional Predictive Ordinate for Poisson data
+#'
+#' @param y Vector of response variable
+#' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#'
+#' @return cpo Conditional Predictive Ordinate
+#'
+
+CPO_bernoulli <- function(y, p){
+  niter <- length(p)
+  px <- dbinom(x = y, size = 1, prob = p)
+  px <- ifelse(px < .Machine$double.eps, .Machine$double.eps, px)
+  cpo <- niter/sum(1/px, na.rm = T)
+  return(cpo)
+}
+
+#' @title Log Pseudo Marginal Likelihood
+#'
+#' @param y Vector of response variable
+#' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#'
+#' @return LPML -2 * Log Pseudo Marginal Likelihood measure
+
+LPML <- function(y, p){
+  aux <- data.frame(y, t(p))
+  CPO <- apply(X = aux, MARGIN = 1,
+               FUN = function(x) CPO_bernoulli(y = x[1], p = x[-1]))
+  LPML <- sum(log(CPO), na.rm = T)
+  return(-2*LPML)
+}
+
+#' @title Deviance Information Criterion
+#'
+#' @param y Vector of response variable
+#' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#'
+#' @return DIC Deviance Information Criterion measure
+
+DIC <- function(y, p){
+  niter <- nrow(p)
+  thetaBayes <- colMeans(p)
+  log_px <- dbinom(x = y, size = 1, prob = thetaBayes, log = TRUE)
+  log_px <- sum(log_px, na.rm = T)
+  p <- cbind(y, t(p))
+  esp_log_px <- apply(p, MARGIN = 1,
+                      FUN = function(x) dbinom(x = x[1], size = 1, prob = x[-1], log = TRUE))
+  esp_log_px <- sum(esp_log_px, na.rm = T)/niter
+
+  pDIC <- 2*(log_px - esp_log_px)
+  DIC <- -2*log_px + 2*pDIC
+  return(DIC)
+}
+
+#' @title Widely Applicable Information Criterion
+#'
+#' @param y Vector of response variable
+#' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#'
+#' @return WAIC_1 Widely Applicable Information Criterion measure
+
+WAIC <- function(y, p){
+  aux <- data.frame(y, t(p))
+  px <- apply(aux, MARGIN = 1,
+              FUN = function(x) dbinom(x = x[1], size = 1, p = x[-1]))
+  px <- ifelse(px < .Machine$double.eps, .Machine$double.eps, px)
+  log_px <- log(px)
+  lppd <- sum(log(colMeans(px, na.rm = T)))
+  mean_log_px <- colMeans(log_px, na.rm = T)
+  log_mean_px <- log(colMeans(px, na.rm = T))
+  pWAIC <- 2*sum(log_mean_px - mean_log_px)
+  WAIC <- -2*(lppd - pWAIC)
+  return(WAIC)
+}
+
+#' @title LPML, DIC and WAIC measures
+#'
+#' @param y Vector of response variable
+#' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#'
+#' @return measures A data.frame with LMPL, DIC and WAIC measures
+
+fit_measures <- function(y, p){
+  lpml <- LPML(y, p)
+  dic <- DIC(y, p)
+  waic <- WAIC(y, p)
+  measures <- data.frame('DIC' = dic, '-2*LPML' = lpml, 'WAIC' = waic, check.names = F)
+  return(measures = measures)
+}
+
 rtnorm <- function(n, mean, sd, truncA = -Inf, truncB = Inf){
 
   u <- stats::runif(n = n, min = 0, max = 1)

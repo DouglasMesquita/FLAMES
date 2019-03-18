@@ -53,5 +53,7 @@ summary.robit <- function(object, HPD = T, ...){
   rownames(other_info) <- c("c parameter", "Degrees of freedom")
   ans$'Other parameters' <- other_info
 
+  ans$'Fit measures' <- object$fit_measures
+
   return(ans)
 }

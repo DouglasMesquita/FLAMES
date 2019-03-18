@@ -7,6 +7,7 @@
 #' @slot lambda A vector with lambda parameter sample
 #' @slot time Time elapsed
 #' @slot call Function call
+#' @slot fit_measures DIC, -2*LPML and WAIC measures
 #'
 #' @importFrom methods new
 #'
@@ -19,4 +20,5 @@ robit_class <- setClass(Class = 'robit',
                                        df = 'numeric',
                                        lambda = 'numeric',
                                        time = 'numeric',
-                                       call = 'call'))
+                                       call = 'call',
+                                       fit_measures = 'data.frame'))
