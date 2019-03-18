@@ -74,7 +74,7 @@ if(interactive()){
  df <- 10
 
  ##-- p and y
- p <- tbreg:::inv_link(x = XBeta, type = type_data, df = df)*c2 + c1
+ p <- crobit:::inv_link(x = XBeta, type = type_data, df = df)*c2 + c1
  y <- rbinom(n = n, size = 1, prob = p)
 
  bd <- data.frame(y = y, X)

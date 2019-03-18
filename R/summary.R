@@ -1,14 +1,14 @@
-#' Summary for tbreg class (coda is necessary)
+#' Summary for crobit class (coda is necessary)
 #'
-#' @param object tbreg object to summarise
+#' @param object crobit object to summarise
 #' @param HPD HPD intervals or quantiles (TRUE or FALSE)
 #' @param ... Other parameters for summary
 #'
-#' @method summary tbreg
+#' @method summary crobit
 #'
 #' @export
 
-summary.tbreg <- function(object, HPD = T, ...){
+summary.crobit <- function(object, HPD = T, ...){
 
   ans <- list()
   ans$'Call' <- object$call

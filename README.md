@@ -1,12 +1,12 @@
-tbreg
+crobit
 ======
 
 # Tobit binary regression
 
-To install the package **```tbreg```** use the **```install_github()```** function from **```devtools```**.
+To install the package **```crobit```** use the **```install_github()```** function from **```devtools```**.
 
 ```{r}
-devtools::install_github('DouglasMesquita/tbreg')
-library(tbreg)
+devtools::install_github('DouglasMesquita/crobit')
+library(crobit)
 ?mcmc_bin
 ```

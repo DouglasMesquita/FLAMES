@@ -1,17 +1,17 @@
-#' Plot for tbreg class
+#' Plot for crobit class
 #'
-#' @param x tbreg object to plot
+#' @param x crobit object to plot
 #' @param bty Box style
 #' @param ask To ask for next plot
 #' @param ... Other parameters for plot
 #'
-#' @method plot tbreg
+#' @method plot crobit
 #'
 #' @import coda
 #'
 #' @export
 
-plot.tbreg <- function(x, bty = "l", ask = T, ...){
+plot.crobit <- function(x, bty = "l", ask = T, ...){
 
   data <- data.frame(x$beta, c = x$c, df = x$df)
 

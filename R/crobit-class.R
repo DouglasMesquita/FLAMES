@@ -1,4 +1,4 @@
-#' An object of 'tbreg' class
+#' An object of 'crobit' class
 #'
 #' @slot p A matrix with estimated probability
 #' @slot beta A matrix with coefficients samples
@@ -12,7 +12,7 @@
 #'
 #' @export
 
-tbreg_class <- setClass(Class = 'tbreg',
+crobit_class <- setClass(Class = 'crobit',
                         representation(p = 'matrix',
                                        beta = 'matrix',
                                        c = 'numeric',

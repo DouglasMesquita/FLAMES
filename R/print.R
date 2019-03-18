@@ -1,16 +1,16 @@
-#' Print for tbreg class
+#' Print for crobit class
 #'
-#' @param x tbreg object to print
+#' @param x crobit object to print
 #' @param ... Other parameters for print
 #'
-#' @method print tbreg
+#' @method print crobit
 #'
 #' @export
 
-print.tbreg <- function(x, ...){
+print.crobit <- function(x, ...){
   cat('Title: \n')
   cat('\n')
   cat('Coefficients:')
   cat('\n')
-  print(coef.tbreg(x))
+  print(coef.crobit(x))
 }

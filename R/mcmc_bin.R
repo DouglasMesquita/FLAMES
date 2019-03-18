@@ -42,7 +42,7 @@
 #'  df <- 10
 #'
 #'  ##-- p and y
-#'  p <- tbreg:::inv_link(x = XBeta, type = type_data, df = df)*c2 + c1
+#'  p <- crobit:::inv_link(x = XBeta, type = type_data, df = df)*c2 + c1
 #'  y <- rbinom(n = n, size = 1, prob = p)
 #'
 #'  bd <- data.frame(y = y, X)
@@ -125,7 +125,7 @@ mcmc_bin <- function(data, formula,
   b_c <- par_c$b
 
   ##-- Getting call, y and X
-  call_tbreg <- match.call()
+  call_crobit <- match.call()
 
   model_fr <- match.call(expand.dots = FALSE)
   match_strings <- match(c("formula", "data"), names(model_fr), 0L)
@@ -209,9 +209,9 @@ mcmc_bin <- function(data, formula,
   out <- list(p = p_prop, beta = p_beta,
               c = p_c, df = p_df, lambda = p_lambda,
               time = time_elapsed,
-              call = call_tbreg)
+              call = call_crobit)
 
-  class(out) <- "tbreg"
+  class(out) <- "crobit"
 
   return(out)
 }

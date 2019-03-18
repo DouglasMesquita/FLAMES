@@ -1,13 +1,13 @@
-#' Coefficients for tbreg class
+#' Coefficients for crobit class
 #'
-#' @param object tbreg object to restore the coefficients
+#' @param object crobit object to restore the coefficients
 #' @param ... Other parameters for coef
 #'
-#' @method coef tbreg
+#' @method coef crobit
 #'
 #' @export
 
-coef.tbreg <- function(object, ...){
+coef.crobit <- function(object, ...){
   coefficients <- colMeans(object$beta)
   return(coefficients)
 }
