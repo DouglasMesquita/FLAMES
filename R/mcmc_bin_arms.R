@@ -24,6 +24,7 @@
 #'
 #' @import HI
 #' @import progress
+#' @import stats
 #'
 #' @export
 

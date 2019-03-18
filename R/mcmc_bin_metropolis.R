@@ -26,6 +26,7 @@
 #' @return Chains of all parameters
 #'
 #' @import progress
+#' @import stats
 #'
 #' @export
 
