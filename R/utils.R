@@ -259,3 +259,29 @@ dtnorm <- function(x, mean, sd, truncA = -Inf, truncB = Inf){
 
   return(prob)
 }
+mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL){
+
+  if(all(is.null(c(mean, var, a, b)))) stop("You must to define mean and sd or a and b.")
+
+  if(all(is.null(c(mean, sd)))){
+    var <- (a*b)/((a+b+1)*(a+b)^2)
+    sd <- sqrt(var)
+    mean <- a/(a+b)
+  }
+
+  if(all(is.null(c(a, b)))){
+    var_lim <- mean*(1-mean)
+
+    if(sd >= sqrt(var_lim)) stop(sprintf("sd must be smaller than %s.", round(sqrt(var_lim), 2)))
+
+    nu <- var_lim/sd^2 - 1
+
+    a <- mean*nu
+    b <- (1-mean)*nu
+  }
+
+  return(list(a = a,
+              b = b,
+              mean = mean,
+              sd = sd))
+}

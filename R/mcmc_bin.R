@@ -10,8 +10,8 @@
 #' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
 #' @param sample_c Should c be sampled?
 #' @param sigma_beta Variance of beta prior
-#' @param a_c Shape1 for c prior (beta)
-#' @param b_c Shape2 for c prior (beta)
+#' @param mean_c Mean for c a priori
+#' @param sd_c Standard deviation for c a priori
 #' @param a_lambda Inferior limit for lambda
 #' @param b_lambda Superior limit for lambda
 #' @param var_df Variance to sample log(df)
@@ -50,8 +50,8 @@
 #'  ##-- Hyperparameters (prioris)
 #'  sigma_beta <- 100
 #'
-#'  a_c <- 0.1  ## non informative beta
-#'  b_c <- 0.1  ## non informative beta
+#'  mean_c <- 0.5
+#'  sd_c <- 0.45
 #'
 #'  a_lambda <- 0.01
 #'  b_lambda <- 1.00
@@ -72,16 +72,16 @@
 #'  out_arms <- mcmc_bin(data = bd, formula = f,
 #'                      nsim = nsim, burnin = burnin, lag = lag,
 #'                      type = type, sample_c = TRUE,
-#'                      sigma_beta = sigma_beta, a_c = a_c, b_c = b_c,
+#'                      sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
 #'                      a_lambda = a_lambda, b_lambda = b_lambda,
 #'                      var_df = var_df, bound_beta = bound_beta,
-#'                      method = "ARMS", force_intercept = TRUE)
+#'                      method = "ARMS")
 #'
 #'  ##-- ARMS ~ 45 seconds
 #'  out_met <- mcmc_bin(data = bd, formula = f,
 #'                     nsim = nsim, burnin = burnin, lag = lag,
 #'                     type = type, sample_c = TRUE,
-#'                     sigma_beta = sigma_beta, a_c = a_c, b_c = b_c,
+#'                     sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
 #'                     a_lambda = a_lambda, b_lambda = b_lambda,
 #'                     var_df = var_df, bound_beta = bound_beta,
 #'                     method = "metropolis")
@@ -108,17 +108,21 @@
 mcmc_bin <- function(data, formula,
                      nsim = 1000, burnin = round(0.1*nsim), lag = 10,
                      type = "logit", sample_c = TRUE,
-                     sigma_beta = 100, a_c = 0.01, b_c = 0.01,
+                     sigma_beta = 100, mean_c = 0.5, sd_c = 0.45,
                      a_lambda = 0.01, b_lambda = 0.99,
                      var_df = 0.04, var_c = 0.02, var_lambda = 0.2,
                      bound_beta,
-                     method = "ARMS", force_intercept = FALSE){
+                     method = "ARMS"){
 
   if(!is.data.frame(data))
     stop("data must be a data.frame")
 
   if(burnin + nsim*lag < 1000)
     stop("Please consider to increase the nsim, burnin and/or lag.")
+
+  par_c <- mean_sd_beta(mean = mean_c, sd = sd_c)
+  a_c <- par_c$a
+  b_c <- par_c$b
 
   ##-- Getting call, y and X
   call_tbreg <- match.call()
@@ -131,15 +135,6 @@ mcmc_bin <- function(data, formula,
   model_types <- attr(model_fr, "terms")
   y <- stats::model.response(model_fr, "numeric")
   X <- stats::model.matrix(model_types, model_fr)
-
-  if(sample_c & "(Intercept)" %in% colnames(X)){
-    if(!force_intercept){
-      X <- X[, -1]
-      warning("Intercept was removed since you want to sample c")
-    }
-
-    if(ncol(X) == 0) stop("You need at least one covariate. We are working on this limitation.")
-  }
 
   ##-- Link function
   inv_link_f <- function(x, df) inv_link(x = x, type = type, df = df)
