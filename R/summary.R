@@ -69,7 +69,7 @@ summary.robit <- function(object, HPD = T, ...){
       quantile_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
 
       lower <- quantile_df[1]
-      upper <- quantile_df[1]
+      upper <- quantile_df[2]
 
       mean_vec <- mean(object$df)
       sd_vec <- stats::sd(object$df)

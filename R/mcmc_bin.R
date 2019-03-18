@@ -206,7 +206,7 @@ mcmc_bin <- function(data, formula,
 
   colnames(p_beta) <- colnames(X)
 
-  fit <- fit_measures(y = y, p = as.matrix(p_df))
+  fit <- fit_measures(y = y, p = as.matrix(p_prop))
   if(!sample_c) p_c <- NULL
 
   out <- list(p = p_prop, beta = p_beta,
