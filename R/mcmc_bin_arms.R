@@ -6,7 +6,7 @@
 #' @param X Covariate matrix
 #' @param sample_size Sample size required for MCMC
 #' @param inv_link_f Inverse link function
-#' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
 #' @param sample_c Should c be sampled?
 #' @param sigma_beta Variance of beta prior
 #' @param a_c Shape1 for c prior
@@ -86,7 +86,7 @@ mcmc_bin_arms <- function(y, X,
                          n.sample = 1)
     }
 
-    if(type == "tobit"){
+    if(type == "robit"){
       ##-- lambda parameter
       y_start <- p_lambda[i-1]
       aux_lambda <- HI::arms(y.start = y_start,

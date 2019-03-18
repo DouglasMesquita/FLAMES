@@ -7,7 +7,7 @@
 #' @param nsim Sample size required for MCMC
 #' @param burnin Burn in for MCMC
 #' @param lag Lag for MCMC
-#' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
 #' @param sample_c Should c be sampled?
 #' @param sigma_beta Variance of beta prior
 #' @param mean_c Mean for c a priori
@@ -38,7 +38,7 @@
 #'  c1 <- 0.2
 #'  c2 <- 1 - c1
 #'
-#'  type_data = "tobit"
+#'  type_data = "robit"
 #'  df <- 10
 #'
 #'  ##-- p and y
@@ -61,7 +61,7 @@
 #'  burnin <- 5000
 #'  lag <- 10
 #'
-#'  type <- "tobit"
+#'  type <- "robit"
 #'  bound_beta <- c(-10, 10)
 #'  var_df <- 0.5
 #'  n_points <- 6

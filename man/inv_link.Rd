@@ -9,9 +9,9 @@ inv_link(x, type = "logit", df = 1)
 \arguments{
 \item{x}{Value to evaluate the cumulative distribution}
 
-\item{type}{"logit", "probit", "cauchit", "tobit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
 
-\item{df}{Degrees of freedom (if type = "tobit")}
+\item{df}{Degrees of freedom (if type = "robit")}
 }
 \value{
 Cumulative probability in x

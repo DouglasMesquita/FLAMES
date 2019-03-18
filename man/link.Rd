@@ -9,9 +9,9 @@ link(x, type = "logistic", df = 1)
 \arguments{
 \item{x}{Probability to evaluate the quantile}
 
-\item{type}{"logit", "probit", "cauchit", "tobit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
 
-\item{df}{Degrees of freedom (if type = "tobit")}
+\item{df}{Degrees of freedom (if type = "robit")}
 }
 \value{
 Quantile of x

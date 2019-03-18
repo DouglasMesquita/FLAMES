@@ -1,8 +1,8 @@
 #' @title Inverse link function for several models (cumulative distributions)
 #'
 #' @param x Value to evaluate the cumulative distribution
-#' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
-#' @param df Degrees of freedom (if type = "tobit")
+#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param df Degrees of freedom (if type = "robit")
 #'
 #' @return Cumulative probability in x
 
@@ -17,7 +17,7 @@ inv_link <- function(x, type = "logit", df = 1){
   if(type == "cauchit"){
     cum_prob <- stats::pcauchy(q = x)
   }
-  if(type == "tobit"){
+  if(type == "robit"){
     cum_prob <- stats::pt(q = x, df = df)
   }
   if(type == "cloglog"){
@@ -30,8 +30,8 @@ inv_link <- function(x, type = "logit", df = 1){
 #' @title Link function for several models
 #'
 #' @param x Probability to evaluate the quantile
-#' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
-#' @param df Degrees of freedom (if type = "tobit")
+#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param df Degrees of freedom (if type = "robit")
 #'
 #' @return Quantile of x
 
@@ -46,7 +46,7 @@ link <- function(x, type = "logistic", df = 1){
   if(type == "cauchit"){
     quantile_x <- stats::qcauchy(p = x)
   }
-  if(type == "tobit"){
+  if(type == "robit"){
     quantile_x <- stats::qt(p = x, df = df)
   }
   if(type == "cloglog"){

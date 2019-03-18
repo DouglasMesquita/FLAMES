@@ -21,7 +21,7 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 
 \item{lag}{Lag for MCMC}
 
-\item{type}{"logit", "probit", "cauchit", "tobit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
 
 \item{sample_c}{Should c be sampled?}
 
@@ -70,7 +70,7 @@ if(interactive()){
  c1 <- 0.2
  c2 <- 1 - c1
 
- type_data = "tobit"
+ type_data = "robit"
  df <- 10
 
  ##-- p and y
@@ -93,7 +93,7 @@ if(interactive()){
  burnin <- 5000
  lag <- 10
 
- type <- "tobit"
+ type <- "robit"
  bound_beta <- c(-10, 10)
  var_df <- 0.5
  n_points <- 6

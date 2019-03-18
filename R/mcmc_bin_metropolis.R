@@ -7,7 +7,7 @@
 #' @param sample_size Sample size required for MCMC
 #' @param burnin Burn in period (to adapt metropolis)
 #' @param inv_link_f Inverse link function
-#' @param type "logit", "probit", "cauchit", "tobit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
 #' @param sample_c Should c be sampled?
 #' @param sigma_beta Variance of beta prior
 #' @param a_c Shape1 for c prior
@@ -126,7 +126,7 @@ mcmc_bin_metropolis <- function(y, X,
       }
     }
 
-    if(type == "tobit"){
+    if(type == "robit"){
       ##-- lambda parameter
       post_lambda_current <- lambda_posterior(p_df = p_df[i-1], p_lambda = p_lambda[i-1],
                                               inv_link_f = inv_link_f,

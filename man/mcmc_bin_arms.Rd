@@ -17,7 +17,7 @@ mcmc_bin_arms(y, X, sample_size, inv_link_f, type, sample_c, sigma_beta,
 
 \item{inv_link_f}{Inverse link function}
 
-\item{type}{"logit", "probit", "cauchit", "tobit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
 
 \item{sample_c}{Should c be sampled?}
 
