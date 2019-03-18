@@ -1,7 +1,7 @@
 robit
 ======
 
-# Tobit binary regression
+# Robit binary regression
 
 To install the package **```robit```** use the **```install_github()```** function from **```devtools```**.
 
