@@ -306,7 +306,7 @@ DIC <- function(y, p){
 WAIC <- function(y, p){
   aux <- data.frame(y, t(p))
   px <- apply(aux, MARGIN = 1,
-              FUN = function(x) dbinom(x = x[1], size = 1, p = x[-1]))
+              FUN = function(x) dbinom(x = x[1], size = 1, prob = x[-1]))
   px <- ifelse(px < .Machine$double.eps, .Machine$double.eps, px)
   log_px <- log(px)
   lppd <- sum(log(colMeans(px, na.rm = T)))
