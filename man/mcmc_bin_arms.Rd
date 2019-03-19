@@ -4,16 +4,20 @@
 \alias{mcmc_bin_arms}
 \title{MCMC for binary regression - ARMS version}
 \usage{
-mcmc_bin_arms(y, X, sample_size, inv_link_f, type, sample_c, sigma_beta,
-  a_c, b_c, a_lambda, b_lambda, bound_beta, p_c, p_prop, p_beta, p_df,
-  p_lambda)
+mcmc_bin_arms(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
+  sigma_beta, a_c, b_c, a_lambda, b_lambda, bound_beta, p_c, p_prop,
+  p_beta, p_df, p_lambda)
 }
 \arguments{
 \item{y}{Bernoulli observed values}
 
 \item{X}{Covariate matrix}
 
-\item{sample_size}{Sample size required for MCMC}
+\item{nsim}{Sample size required for MCMC}
+
+\item{burnin}{Burn in for MCMC}
+
+\item{lag}{Lag for MCMC}
 
 \item{inv_link_f}{Inverse link function}
 

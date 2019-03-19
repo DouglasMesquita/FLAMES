@@ -4,7 +4,7 @@
 \alias{mcmc_bin_metropolis}
 \title{MCMC for binary regression - Metropolis version}
 \usage{
-mcmc_bin_metropolis(y, X, sample_size, burnin, inv_link_f, type, sample_c,
+mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
   sigma_beta, a_c, b_c, a_lambda, b_lambda, var_df, var_c, var_lambda, p_c,
   p_prop, p_beta, p_df, p_lambda)
 }
@@ -13,9 +13,11 @@ mcmc_bin_metropolis(y, X, sample_size, burnin, inv_link_f, type, sample_c,
 
 \item{X}{Covariate matrix}
 
-\item{sample_size}{Sample size required for MCMC}
+\item{nsim}{Sample size required for MCMC}
 
-\item{burnin}{Burn in period (to adapt metropolis)}
+\item{burnin}{Burn in for MCMC}
+
+\item{lag}{Lag for MCMC}
 
 \item{inv_link_f}{Inverse link function}
 

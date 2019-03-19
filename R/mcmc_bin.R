@@ -111,7 +111,7 @@ mcmc_bin <- function(data, formula,
                      sigma_beta = 100, mean_c = 0.5, sd_c = 0.45,
                      a_lambda = 0.01, b_lambda = 0.99,
                      var_df = 0.04, var_c = 0.02, var_lambda = 0.2,
-                     bound_beta,
+                     bound_beta = c(-10, 10),
                      method = "ARMS"){
 
   if(!is.data.frame(data))
@@ -140,22 +140,21 @@ mcmc_bin <- function(data, formula,
   inv_link_f <- function(x, df) inv_link(x = x, type = type, df = df)
   link_f <- function(x, df) link(x = x, type = type, df = df)
 
-  sample_size <- burnin + lag*nsim
   n_cov <- ncol(X)
   n <- nrow(X)
 
-  p_c <- rep(0.5, sample_size)
-  if(!sample_c) p_c <- rep(0, sample_size)
+  p_c <- rep(0.5, nsim)
+  if(!sample_c) p_c <- rep(0, nsim)
 
-  p_prop <- matrix(0.5, nrow = sample_size, ncol = n)
-  p_beta <- matrix(0, nrow = sample_size, ncol = n_cov)
-  p_df <- rep(5, sample_size)
-  p_lambda <- rep(0.2, sample_size)
+  p_prop <- matrix(0.5, nrow = nsim, ncol = n)
+  p_beta <- matrix(0, nrow = nsim, ncol = n_cov)
+  p_df <- rep(5, nsim)
+  p_lambda <- rep(0.2, nsim)
 
   time_1 <- Sys.time()
   if(method == "metropolis"){
     samp <- mcmc_bin_metropolis(y = y, X = X,
-                                sample_size = sample_size, burnin = burnin,
+                                nsim = nsim, burnin = burnin, lag = lag,
                                 inv_link_f = inv_link_f,
                                 type = type, sample_c = sample_c,
                                 sigma_beta = sigma_beta,
@@ -173,7 +172,7 @@ mcmc_bin <- function(data, formula,
   } else{
     if(method == "ARMS"){
       samp <- mcmc_bin_arms(y = y, X = X,
-                            sample_size = sample_size,
+                            nsim = nsim, burnin = burnin, lag = lag,
                             inv_link_f = inv_link_f,
                             type = type, sample_c = sample_c,
                             sigma_beta = sigma_beta,
@@ -196,14 +195,6 @@ mcmc_bin <- function(data, formula,
   time_elapsed <- time_2 - time_1
 
   ##-- Outputs
-  pos <- seq((burnin + lag), sample_size, by = lag)
-
-  p_beta <- p_beta[pos, ]
-  p_prop <- p_prop[pos, ]
-  p_c <- p_c[pos]
-  p_df <- p_df[pos]
-  p_lambda <- p_lambda[pos]
-
   colnames(p_beta) <- colnames(X)
 
   fit <- fit_measures(y = y, p = as.matrix(p_prop))

@@ -4,7 +4,9 @@
 #'
 #' @param y Bernoulli observed values
 #' @param X Covariate matrix
-#' @param sample_size Sample size required for MCMC
+#' @param nsim Sample size required for MCMC
+#' @param burnin Burn in for MCMC
+#' @param lag Lag for MCMC
 #' @param inv_link_f Inverse link function
 #' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
 #' @param sample_c Should c be sampled?
@@ -29,12 +31,14 @@
 #' @export
 
 mcmc_bin_arms <- function(y, X,
-                          sample_size,
+                          nsim, burnin, lag,
                           inv_link_f,
                           type, sample_c,
                           sigma_beta, a_c, b_c, a_lambda, b_lambda,
                           bound_beta,
                           p_c, p_prop, p_beta, p_df, p_lambda){
+
+  sample_size <- burnin + lag*nsim
 
   ##-- Indicator functions for HI package
   lim_beta <- exp(bound_beta)/(1+exp(bound_beta))
@@ -46,74 +50,84 @@ mcmc_bin_arms <- function(y, X,
 
   n_cov <- ncol(X)
 
+  beta_aux <- p_beta[1, ]
+  c_aux <- p_c[1]
+  df_aux <- p_df[1]
+  lambda_aux <- p_lambda[1]
+
+  ##-- Progress bar
   pb <- progress::progress_bar$new(total = sample_size-1)
+
   ##-- Loop ----
   for(i in 2:sample_size){
     pb$tick()
 
     ##-- Regression coefficients
-    aux_beta <- p_beta[(i-1), ]
-
     for(j in 1:n_cov){
-      y_start <- exp(p_beta[(i-1), j])/(1+exp(p_beta[(i-1), j]))
-
-      aux_beta_j <- HI::arms(y.start = y_start,
+      y_start <- exp(beta_aux[j])/(1+exp(beta_aux[j]))
+      beta_aux_j <- HI::arms(y.start = y_start,
                              myldens = function(x) beta_posterior(y = y, X = X,
-                                                                  p_beta = aux_beta, p_beta_element = x, element = j,
-                                                                  p_c = p_c[i-1], p_df = p_df[i-1],
+                                                                  p_beta = beta_aux, p_beta_element = x, element = j,
+                                                                  p_c = c_aux, p_df = df_aux,
                                                                   inv_link_f = inv_link_f,
                                                                   sigma_beta = sigma_beta,
                                                                   log = TRUE, method = "ARMS"),
                              indFunc = ind_fun_beta,
                              n.sample = 1)
 
-      aux_beta[j] <- log(aux_beta_j/(1-aux_beta_j))
-
-      p_beta[i, j] <- aux_beta[j]
+      beta_aux[j] <- log(beta_aux_j/(1-beta_aux_j))
     }
 
     ##-- c parameter
     if(sample_c){
-      y_start <- p_c[(i-1)]
-      p_c[i] <- HI::arms(y.start = y_start,
-                         myldens = function(x) c_posterior(y = y, X = X,
-                                                           p_beta = p_beta[i, ],
-                                                           p_c = x, p_df = p_df[i-1],
-                                                           inv_link_f = inv_link_f,
-                                                           a_c = a_c, b_c = b_c,
-                                                           log = TRUE),
-                         indFunc = ind_fun_c,
-                         n.sample = 1)
+      y_start <- c_aux
+      c_aux <- HI::arms(y.start = y_start,
+                        myldens = function(x) c_posterior(y = y, X = X,
+                                                          p_beta = beta_aux,
+                                                          p_c = x, p_df = df_aux,
+                                                          inv_link_f = inv_link_f,
+                                                          a_c = a_c, b_c = b_c,
+                                                          log = TRUE),
+                        indFunc = ind_fun_c,
+                        n.sample = 1)
     }
 
     if(type == "robit"){
       ##-- lambda parameter
-      y_start <- p_lambda[i-1]
-      aux_lambda <- HI::arms(y.start = y_start,
-                             myldens = function(x) lambda_posterior(p_df = p_df[i-1], p_lambda = x,
+      y_start <- lambda_aux
+      lambda_aux <- HI::arms(y.start = y_start,
+                             myldens = function(x) lambda_posterior(p_df = df_aux, p_lambda = x,
                                                                     inv_link_f = inv_link_f,
                                                                     log = TRUE),
                              indFunc = ind_fun_lambda,
                              n.sample = 1)
 
-      p_lambda[i] <- aux_lambda
-
       ##-- df parameter
       const <- 50
 
-      y_start <- 1-exp(-p_df[i-1]/const)
-      aux_df <- HI::arms(y.start = y_start ,
+      y_start <- 1-exp(-df_aux/const)
+      df_aux <- HI::arms(y.start = y_start ,
                          myldens = function(x) df_posterior(y = y, X = X,
-                                                            p_beta = p_beta[i, ], p_c = p_c[i], p_df = x, p_lambda = p_lambda[i],
+                                                            p_beta = beta_aux, p_c = c_aux, p_df = x, p_lambda = lambda_aux,
                                                             inv_link_f = inv_link_f,
                                                             log = TRUE, method = "ARMS", const = const),
                          indFunc = ind_fun_df,
                          n.sample = 1)
 
-      p_df[i] <- -const*log(1-aux_df)
+      df_aux <- -const*log(1-df_aux)
     }
 
-    p_prop[i, ] <- make_p(p_c = p_c[i], X = X, p_beta = p_beta[i, ], p_df = p_df[i], inv_link_f = inv_link_f)
+    ##-- Saving the iteration i
+    if((i-burnin)%%lag == 0 & i > burnin){
+      pos <- (i-burnin)/lag
+
+      p_c[pos] <- c_aux
+      p_beta[pos, ] <- beta_aux
+      p_lambda[pos] <- lambda_aux
+      p_df[pos] <- df_aux
+
+      p_prop[pos, ] <- make_p(p_c = p_c[pos], X = X, p_beta = p_beta[pos, ], p_df = p_df[pos], inv_link_f = inv_link_f)
+    }
   }
 
   ##-- Outputs

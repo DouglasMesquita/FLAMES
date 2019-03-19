@@ -7,8 +7,8 @@
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
   mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 0.99,
-  var_df = 0.04, var_c = 0.02, var_lambda = 0.2, bound_beta,
-  method = "ARMS")
+  var_df = 0.04, var_c = 0.02, var_lambda = 0.2,
+  bound_beta = c(-10, 10), method = "ARMS")
 }
 \arguments{
 \item{data}{Dataset to be used}
