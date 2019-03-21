@@ -27,6 +27,6 @@ Usage
 
 `library(robit)` will load the following function:
 
--   **mcmc\_bin**, for generating the CAR structure.
+-   **mcmc\_bin**, for binary regression. The user can choose for MCMC based on ARMS or Metropolis Hastings.
 
 See `?mcmc_bin` for a complete example of how to use this package and for examples.
