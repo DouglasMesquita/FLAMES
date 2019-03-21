@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-A package to fit binary regression under several link functions and a possible cure fraction term in the form $$p_i = c + (1-c)F_v(X \beta)$$.
+A package to fit binary regression under several link functions and a possible cure fraction term in the form $p_i = c + (1-c)F_v(\text{X}\beta$)
 
 ## Installation
 
