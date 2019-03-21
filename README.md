@@ -1,12 +1,32 @@
+
 robit
-======
+=====
 
-# Robit binary regression
+<!-- badges: start -->
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/robit)](https://cran.r-project.org/package=robit) -->
+\[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)\](<https://travis-ci.org/DouglasMesquita/robit> [![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/robit/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/robit?branch=master) <!-- badges: end -->
 
-To install the package **```robit```** use the **```install_github()```** function from **```devtools```**.
+Overview
+--------
 
-```{r}
-devtools::install_github('DouglasMesquita/robit')
-library(robit)
-?mcmc_bin
+A package to fit binary regression under several link functions and a possible cure fraction term in the form *p*<sub>*i*</sub> = *c* + (1 − *c*)*F*<sub>*v*</sub>(*X**β*).
+
+Installation
+------------
+
+``` r
+# Install from CRAN (when available)
+install.packages("robit")
+# Or the development version from GitHub
+# install.packages("devtools")
+devtools::install_github("DouglasMesquita/robit")
 ```
+
+Usage
+-----
+
+`library(robit)` will load the following function:
+
+-   **mcmc\_bin**, for generating the CAR structure.
+
+See `?mcmc_bin` for a complete example of how to use this package and for examples.

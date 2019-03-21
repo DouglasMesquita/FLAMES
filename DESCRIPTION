@@ -5,13 +5,15 @@ Version: 0.1.0
 Author: Douglas R. M. Azevedo, Marcos O. Prates, Renato M. Assuncao
 Maintainer: Douglas R. M. Azevedo <douglasrm.azevedo@gmail.com>
 Depends: 
-    R (>= 3.5),
-    methods,
-    stats
+    R (>= 3.5)
 Imports:
+    methods,
+    stats,
     HI, 
     progress, 
     coda
+Suggests:
+    covr
 Description: Fit binary regression with several link functions including a possible constant parameter c as: c + (1-c)F^(-1)(p) = Xbeta in which F is a valid cumulative distribution.
 License: GPL-2
 Encoding: UTF-8

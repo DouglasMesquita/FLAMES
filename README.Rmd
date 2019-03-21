@@ -1,0 +1,41 @@
+---
+  output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# robit
+
+<!-- badges: start -->
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/robit)](https://cran.r-project.org/package=robit) -->
+[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)](https://travis-ci.org/DouglasMesquita/robit
+[![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/robit/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/robit?branch=master)
+<!-- badges: end -->
+
+## Overview
+
+A package to fit binary regression under several link functions and a possible cure fraction term in the form $p_i = c + (1-c)F_v(X\beta)$.
+
+## Installation
+
+```{r eval = FALSE}
+# Install from CRAN (when available)
+install.packages("robit")
+# Or the development version from GitHub
+# install.packages("devtools")
+devtools::install_github("DouglasMesquita/robit")
+```
+
+## Usage
+
+`library(robit)` will load the following function:
+
+* **mcmc_bin**, for generating the CAR structure.
+
+See `?mcmc_bin` for a complete example of how to use this package and for examples.
