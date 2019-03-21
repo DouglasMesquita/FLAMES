@@ -17,6 +17,10 @@ lambda_posterior(p_df, p_lambda, inv_link_f, log = TRUE,
 \item{log}{For log-scale values}
 
 \item{method}{"ARMS" or "metropolis"}
+
+\item{a_lambda}{Inferior limit for lambda}
+
+\item{b_lambda}{Superior limit for lambda}
 }
 \value{
 Likelihood value

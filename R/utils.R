@@ -217,6 +217,8 @@ df_posterior <- function(y, X,
 #' @param inv_link_f Inverse link function
 #' @param log For log-scale values
 #' @param method "ARMS" or "metropolis"
+#' @param a_lambda Inferior limit for lambda
+#' @param b_lambda Superior limit for lambda
 #'
 #' @return Likelihood value
 

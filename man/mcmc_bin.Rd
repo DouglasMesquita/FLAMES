@@ -6,7 +6,7 @@
 \usage{
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
-  mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 1,
+  mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 0.99,
   var_df = 0.6, var_c = 0.4, var_lambda = 2.4, bound_beta = c(-10,
   10), method = "ARMS", const = 1)
 }
@@ -108,7 +108,7 @@ MCMC for binary regression
                      sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
                      a_lambda = a_lambda, b_lambda = b_lambda,
                      var_df = var_df, bound_beta = bound_beta,
-                     method = "ARMS")
+                     method = "ARMS", const = 50)
 
  ##-- ARMS ~ 45 seconds
  out_met <- mcmc_bin(data = bd, formula = f,
@@ -117,7 +117,7 @@ MCMC for binary regression
                     sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
                     a_lambda = a_lambda, b_lambda = b_lambda,
                     var_df = var_df, bound_beta = bound_beta,
-                    method = "metropolis")
+                    method = "metropolis", const = 50)
 
  ##-- GLM
  out_glm <- glm(formula = f, data = bd, family = "binomial")
