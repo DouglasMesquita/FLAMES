@@ -5,7 +5,7 @@
 \title{Degree of freedom posterior distribution}
 \usage{
 df_posterior(y, X, p_beta, p_c, p_df, p_lambda, inv_link_f, log = TRUE,
-  method = "ARMS", const = 50)
+  method = "ARMS", const)
 }
 \arguments{
 \item{y}{Bernoulli observed values}

@@ -4,7 +4,7 @@
 \alias{link}
 \title{Link function for several models}
 \usage{
-link(x, type = "logistic", df = 1)
+link(x, type = "logit", df = 1)
 }
 \arguments{
 \item{x}{Probability to evaluate the quantile}

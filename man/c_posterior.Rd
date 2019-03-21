@@ -5,7 +5,7 @@
 \title{c posterior distribution}
 \usage{
 c_posterior(y, X, p_beta, p_c, p_df, inv_link_f, a_c = 1, b_c = 1,
-  log = TRUE)
+  log = TRUE, method = "ARMS")
 }
 \arguments{
 \item{y}{Bernoulli observed values}
@@ -25,6 +25,8 @@ c_posterior(y, X, p_beta, p_c, p_df, inv_link_f, a_c = 1, b_c = 1,
 \item{b_c}{Shape2 for c prior}
 
 \item{log}{For log-scale values}
+
+\item{method}{"ARMS" or "metropolis"}
 }
 \value{
 Likelihood value

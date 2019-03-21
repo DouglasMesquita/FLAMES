@@ -19,8 +19,9 @@
 #' @param var_lambda Variance to sample lambda
 #' @param bound_beta Limits to sample beta for ARMS
 #' @param method "metropolis" or "ARMS"
+#' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
 #'
-#' @examples if(interactive()){
+#' @examples \dontrun{
 #'  set.seed(1)
 #'
 #'  ##-- Data ----
@@ -64,7 +65,6 @@
 #'  type <- "robit"
 #'  bound_beta <- c(-10, 10)
 #'  var_df <- 0.5
-#'  n_points <- 6
 #'
 #'  f <- y ~ X1 + X2
 #'
@@ -109,18 +109,18 @@ mcmc_bin <- function(data, formula,
                      nsim = 1000, burnin = round(0.1*nsim), lag = 10,
                      type = "logit", sample_c = TRUE,
                      sigma_beta = 100, mean_c = 0.5, sd_c = 0.45,
-                     a_lambda = 0.01, b_lambda = 0.99,
-                     var_df = 0.04, var_c = 0.02, var_lambda = 0.2,
+                     a_lambda = 0.01, b_lambda = 1,
+                     var_df = 0.60, var_c = 0.4, var_lambda = 2.4,
                      bound_beta = c(-10, 10),
-                     method = "ARMS"){
+                     method = "ARMS",
+                     const = 1){
 
-  if(!is.data.frame(data))
-    stop("data must be a data.frame")
+  if(!is.data.frame(data)) stop("data must be a data.frame")
+  if(burnin + nsim*lag < 1000) stop("Please consider to increase the nsim, burnin and/or lag.")
+  if(a_lambda < 0) stop("a_lambda must be > 0")
+  if(b_lambda < a_lambda) stop("a_lambda must be < b_lambda")
 
-  if(burnin + nsim*lag < 1000)
-    stop("Please consider to increase the nsim, burnin and/or lag.")
-
-  par_c <- mean_sd_beta(mean = mean_c, sd = sd_c)
+  par_c <- mean_sd_beta(mean = mean_c, sd = sd_c, show_warnings = TRUE)
   a_c <- par_c$a
   b_c <- par_c$b
 
@@ -149,7 +149,7 @@ mcmc_bin <- function(data, formula,
   p_prop <- matrix(0.5, nrow = nsim, ncol = n)
   p_beta <- matrix(0, nrow = nsim, ncol = n_cov)
   p_df <- rep(5, nsim)
-  p_lambda <- rep(0.2, nsim)
+  p_lambda <- rep(mean(c(a_lambda, b_lambda)), nsim)
 
   time_1 <- Sys.time()
   if(method == "metropolis"){
@@ -161,7 +161,8 @@ mcmc_bin <- function(data, formula,
                                 a_c = a_c, b_c = b_c,
                                 a_lambda = a_lambda, b_lambda = b_lambda,
                                 var_df = var_df, var_c = var_c, var_lambda = var_lambda,
-                                p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda)
+                                p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda,
+                                const = const)
 
     p_c <- samp$p_c
     p_prop <- samp$p_prop
@@ -179,7 +180,8 @@ mcmc_bin <- function(data, formula,
                             a_c = a_c, b_c = b_c,
                             a_lambda = a_lambda, b_lambda = b_lambda,
                             bound_beta = bound_beta,
-                            p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda)
+                            p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda,
+                            const = const)
 
       p_c <- samp$p_c
       p_prop <- samp$p_prop

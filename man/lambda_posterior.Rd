@@ -4,7 +4,8 @@
 \alias{lambda_posterior}
 \title{Lambda for degree of freedom posterior distribution}
 \usage{
-lambda_posterior(p_df, p_lambda, inv_link_f, log = TRUE)
+lambda_posterior(p_df, p_lambda, inv_link_f, log = TRUE,
+  method = "ARMS", a_lambda = NULL, b_lambda = NULL)
 }
 \arguments{
 \item{p_df}{Degrees of freedom}
@@ -14,6 +15,8 @@ lambda_posterior(p_df, p_lambda, inv_link_f, log = TRUE)
 \item{inv_link_f}{Inverse link function}
 
 \item{log}{For log-scale values}
+
+\item{method}{"ARMS" or "metropolis"}
 }
 \value{
 Likelihood value

@@ -6,9 +6,9 @@
 \usage{
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
-  mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 0.99,
-  var_df = 0.04, var_c = 0.02, var_lambda = 0.2,
-  bound_beta = c(-10, 10), method = "ARMS")
+  mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 1,
+  var_df = 0.6, var_c = 0.4, var_lambda = 2.4, bound_beta = c(-10,
+  10), method = "ARMS", const = 1)
 }
 \arguments{
 \item{data}{Dataset to be used}
@@ -44,6 +44,8 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 \item{bound_beta}{Limits to sample beta for ARMS}
 
 \item{method}{"metropolis" or "ARMS"}
+
+\item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
 }
 \value{
 Chains of all parameters
@@ -52,7 +54,7 @@ Chains of all parameters
 MCMC for binary regression
 }
 \examples{
-if(interactive()){
+\dontrun{
  set.seed(1)
 
  ##-- Data ----
@@ -96,7 +98,6 @@ if(interactive()){
  type <- "robit"
  bound_beta <- c(-10, 10)
  var_df <- 0.5
- n_points <- 6
 
  f <- y ~ X1 + X2
 

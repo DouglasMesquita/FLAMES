@@ -21,6 +21,7 @@
 #' @param p_beta To restore beta
 #' @param p_df To restore df
 #' @param p_lambda To restore lambda
+#' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
 #'
 #' @return Chains of all parameters
 #'
@@ -36,7 +37,8 @@ mcmc_bin_arms <- function(y, X,
                           type, sample_c,
                           sigma_beta, a_c, b_c, a_lambda, b_lambda,
                           bound_beta,
-                          p_c, p_prop, p_beta, p_df, p_lambda){
+                          p_c, p_prop, p_beta, p_df, p_lambda,
+                          const){
 
   sample_size <- burnin + lag*nsim
 
@@ -103,8 +105,6 @@ mcmc_bin_arms <- function(y, X,
                              n.sample = 1)
 
       ##-- df parameter
-      const <- 50
-
       y_start <- 1-exp(-df_aux/const)
       df_aux <- HI::arms(y.start = y_start ,
                          myldens = function(x) df_posterior(y = y, X = X,
@@ -121,10 +121,10 @@ mcmc_bin_arms <- function(y, X,
     if((i-burnin)%%lag == 0 & i > burnin){
       pos <- (i-burnin)/lag
 
-      p_c[pos] <- c_aux
       p_beta[pos, ] <- beta_aux
-      p_lambda[pos] <- lambda_aux
+      p_c[pos] <- c_aux
       p_df[pos] <- df_aux
+      p_lambda[pos] <- lambda_aux
 
       p_prop[pos, ] <- make_p(p_c = p_c[pos], X = X, p_beta = p_beta[pos, ], p_df = p_df[pos], inv_link_f = inv_link_f)
     }

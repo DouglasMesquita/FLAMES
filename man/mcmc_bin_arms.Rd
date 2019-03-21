@@ -6,7 +6,7 @@
 \usage{
 mcmc_bin_arms(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
   sigma_beta, a_c, b_c, a_lambda, b_lambda, bound_beta, p_c, p_prop,
-  p_beta, p_df, p_lambda)
+  p_beta, p_df, p_lambda, const)
 }
 \arguments{
 \item{y}{Bernoulli observed values}
@@ -46,6 +46,8 @@ mcmc_bin_arms(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
 \item{p_df}{To restore df}
 
 \item{p_lambda}{To restore lambda}
+
+\item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
 }
 \value{
 Chains of all parameters

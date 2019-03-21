@@ -35,9 +35,9 @@ inv_link <- function(x, type = "logit", df = 1){
 #'
 #' @return Quantile of x
 
-link <- function(x, type = "logistic", df = 1){
+link <- function(x, type = "logit", df = 1){
 
-  if(type == "logistic"){
+  if(type == "logit"){
     quantile_x <- stats::qlogis(p = x)
   }
   if(type == "probit"){
@@ -143,6 +143,7 @@ beta_posterior <- function(y, X,
 #' @param a_c Shape1 for c prior
 #' @param b_c Shape2 for c prior
 #' @param log For log-scale values
+#' @param method "ARMS" or "metropolis"
 #'
 #' @return Likelihood value
 
@@ -150,11 +151,16 @@ c_posterior <- function(y, X,
                         p_beta, p_c, p_df,
                         inv_link_f,
                         a_c = 1, b_c = 1,
-                        log = TRUE){
+                        log = TRUE, method = "ARMS"){
+
+  p_c_star <- p_c
+
+  if(method == "metropolis") p_c <- exp(p_c)/(1+exp(p_c))
 
   like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_df = p_df, inv_link_f = inv_link_f, log = log)
 
-  post_val <- like + (a_c-1)*log(p_c) + (b_c-1)*log(1-p_c) # prior
+  post_val <- like + (a_c-1)*log(p_c) + (b_c-1)*log(1-p_c)                            # prior
+  if(method == "metropolis") post_val <- post_val + p_c_star - 2*log(1+exp(p_c_star)) # Jacobian
 
   if(!log){
     post_val <- exp(post_val)
@@ -181,21 +187,21 @@ c_posterior <- function(y, X,
 df_posterior <- function(y, X,
                          p_beta,  p_c, p_df, p_lambda,
                          inv_link_f,
-                         log = TRUE, method = "ARMS", const = 50){
+                         log = TRUE, method = "ARMS", const){
 
   p_df_star <- p_df
 
   if(method == "ARMS"){
     p_df <- -const*log(1-p_df)
   } else{
-    p_df <- exp(p_df)
+    p_df <- exp(p_df)/const
   }
 
   like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_df = p_df, inv_link_f = inv_link_f, log = log)
 
-  post_val <- like - (p_lambda*p_df)                                        # prior
-  if(method == "ARMS") post_val <- post_val + log(const) - log(1-p_df_star) # jacobian
-  if(method == "metropolis") post_val <- post_val + p_df_star               # jacobian
+  post_val <- like - (p_lambda*p_df)                                              # prior
+  if(method == "ARMS") post_val <- post_val + log(const) - log(1-p_df_star)       # jacobian
+  if(method == "metropolis") post_val <- post_val + p_df_star - log(const)        # jacobian
 
   if(!log){
     post_val <- exp(post_val)
@@ -210,14 +216,20 @@ df_posterior <- function(y, X,
 #' @param p_lambda Lambda hyperparameter for p_df
 #' @param inv_link_f Inverse link function
 #' @param log For log-scale values
+#' @param method "ARMS" or "metropolis"
 #'
 #' @return Likelihood value
 
 lambda_posterior <- function(p_df, p_lambda,
                              inv_link_f,
-                             log = TRUE){
+                             log = TRUE, method = "ARMS",
+                             a_lambda = NULL, b_lambda = NULL){
+  p_lambda_star <- p_lambda
+
+  if(method == "metropolis") p_lambda <- exp(p_lambda)*(b_lambda - a_lambda)/(1+exp(p_lambda)) + a_lambda
 
   post_val <- log(p_lambda) - p_lambda*p_df
+  if(method == "metropolis") post_val <- post_val + p_lambda_star - 2*log(1+exp(p_lambda_star)) + log(b_lambda - a_lambda) # Jacobian
 
   if(!log){
     post_val <- exp(post_val)
@@ -348,7 +360,7 @@ dtnorm <- function(x, mean, sd, truncA = -Inf, truncB = Inf){
 
   return(prob)
 }
-mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL){
+mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL, show_warnings = FALSE){
 
   if(all(is.null(c(mean, var, a, b)))) stop("You must to define mean and sd or a and b.")
 
@@ -361,7 +373,10 @@ mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL){
   if(all(is.null(c(a, b)))){
     var_lim <- mean*(1-mean)
 
-    if(sd >= sqrt(var_lim)) stop(sprintf("sd must be smaller than %s.", round(sqrt(var_lim), 2)))
+    if(sd >= sqrt(var_lim)){
+      sd <- sqrt(var_lim)*0.99
+      if(show_warnings) warning(sprintf("sd must be smaller than %s. We set it as %s", round(sqrt(var_lim), 2), round(sqrt(var_lim), 2)))
+    }
 
     nu <- var_lim/sd^2 - 1
 
