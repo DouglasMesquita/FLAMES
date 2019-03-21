@@ -4,7 +4,7 @@ robit
 
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/robit)](https://cran.r-project.org/package=robit) -->
-[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)](https://travis-ci.org/DouglasMesquita/robit) [![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/robit/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/robit?branch=master) <!-- badges: end -->
+[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)](https://travis-ci.org/DouglasMesquita/robit) <!-- [![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/robit/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/robit?branch=master) --> <!-- badges: end -->
 
 Overview
 --------
