@@ -1,5 +1,5 @@
 ---
-  output: github_document
+output: github_document
 ---
 
 ```{r, include = FALSE}
@@ -14,13 +14,13 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/robit)](https://cran.r-project.org/package=robit) -->
-[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)](https://travis-ci.org/DouglasMesquita/robit
+[![Travis build status](https://travis-ci.org/DouglasMesquita/robit.svg?branch=master)](https://travis-ci.org/DouglasMesquita/robit)
 [![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/robit/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/robit?branch=master)
 <!-- badges: end -->
 
 ## Overview
 
-A package to fit binary regression under several link functions and a possible cure fraction term in the form $p_i = c + (1-c)F_v(X\beta)$.
+A package to fit binary regression under several link functions and a possible cure fraction term in the form $$p_i = c + (1-c)F_v(X \beta)$$.
 
 ## Installation
 
