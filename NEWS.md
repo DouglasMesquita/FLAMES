@@ -1,3 +1,3 @@
-# robit 0.1.0
+# robit 0.1.1
 
-* Beta version including ARMS and Metropolis Hastings sampling algorithms
+* Using lists instead of vectors and matrix to store MCMC chains

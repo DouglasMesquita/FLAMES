@@ -253,6 +253,7 @@ lambda_posterior <- function(p_df, p_lambda,
 make_p <- function(X, p_beta, p_c, p_df, inv_link_f){
 
   out <- inv_link_f(x = X%*%p_beta, df = p_df)*(1-p_c) + p_c
+  out <- as.numeric(out)
 
   return(out)
 }

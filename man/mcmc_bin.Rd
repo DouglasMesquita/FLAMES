@@ -8,7 +8,7 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
   mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 0.99,
   var_df = 0.6, var_c = 0.4, var_lambda = 2.4, bound_beta = c(-10,
-  10), method = "ARMS", const = 1)
+  10), method = "ARMS", const = 1, fitm = FALSE)
 }
 \arguments{
 \item{data}{Dataset to be used}
@@ -46,6 +46,8 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 \item{method}{"metropolis" or "ARMS"}
 
 \item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
+
+\item{fitm}{Should return fit measures?}
 }
 \value{
 Chains of all parameters

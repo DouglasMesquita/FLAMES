@@ -45,22 +45,22 @@ mcmc_bin_metropolis <- function(y, X,
 
   n_cov <- ncol(X)
 
-  beta_aux <- p_beta[1, ]
-  c_aux <- p_c[1]
-  df_aux <- p_df[1]
-  lambda_aux <- p_lambda[1]
+  beta_aux <- p_beta[[1]]
+  c_aux <- ifelse(!is.null(p_c), p_c[[1]], 0)
+  if(!is.null(p_df)) df_aux <- p_df[[1]]
+  if(!is.null(p_lambda)) lambda_aux <- p_lambda[[1]]
 
   ##-- For adapting MCMC
   it <- 1
   beta_adapt <- matrix(beta_aux, nrow = 100, ncol = n_cov, byrow = TRUE)
-  c_adapt <- rep(c_aux, 100)
-  df_adapt <- rep(df_aux, 100)
-  lambda_adapt <- rep(lambda_aux, 100)
+  if(!is.null(p_c)) c_adapt <- rep(c_aux, 100)
+  if(!is.null(p_df)) df_adapt <- rep(df_aux, 100)
+  if(!is.null(p_lambda)) lambda_adapt <- rep(lambda_aux, 100)
 
   sigma_beta_met <- sqrt(diag(solve(t(X)%*%X)))
-  sigma_df_met <- sqrt(var_df)
-  sigma_c_met <- sqrt(var_c)
-  sigma_lambda_met <- sqrt(var_lambda)
+  if(!is.null(p_c)) sigma_c_met <- sqrt(var_c)
+  if(!is.null(p_df)) sigma_df_met <- sqrt(var_df)
+  if(!is.null(p_lambda)) sigma_lambda_met <- sqrt(var_lambda)
 
   ##-- Stop points
   stop_pts <- seq(100, max(1000, burnin), 100)
@@ -73,9 +73,9 @@ mcmc_bin_metropolis <- function(y, X,
     ##-- Regression coefficients
     if(i %in% stop_pts){
       sigma_beta_met <- sqrt(diag(stats::var(beta_adapt))) + 1e-05
-      sigma_df_met <- stats::sd(df_adapt) + 1e-05
-      sigma_c_met <- stats::sd(c_adapt) + 1e-05
-      sigma_lambda_met <- stats::sd(lambda_adapt) + 1e-05
+      if(!is.null(p_c)) sigma_c_met <- stats::sd(c_adapt) + 1e-05
+      if(!is.null(p_df)) sigma_df_met <- stats::sd(df_adapt) + 1e-05
+      if(!is.null(p_lambda)) sigma_lambda_met <- stats::sd(lambda_adapt) + 1e-05
     }
 
     beta_at <- beta_aux
@@ -191,23 +191,26 @@ mcmc_bin_metropolis <- function(y, X,
       it <- ifelse(i %in% stop_pts, 1, it + 1)
 
       beta_adapt[it, ] <- beta_aux
-      c_adapt[it] <- log(c_aux/(1-c_aux))
-      df_adapt[it] <- log(const*df_aux)
-
-      lambda_01 <- (lambda_aux-a_lambda)/(b_lambda-a_lambda)
-      lambda_adapt[it] <- log(lambda_01/(1-lambda_01))
+      if(!is.null(p_c)) c_adapt[it] <- log(c_aux/(1-c_aux))
+      if(!is.null(p_df)) df_adapt[it] <- log(const*df_aux)
+      if(!is.null(p_lambda)){
+        lambda_01 <- (lambda_aux-a_lambda)/(b_lambda-a_lambda)
+        lambda_adapt[it] <- log(lambda_01/(1-lambda_01))
+      }
     }
 
     ##-- Saving the iteration i
     if((i-burnin)%%lag == 0 & i > burnin){
       pos <- (i-burnin)/lag
 
-      p_beta[pos, ] <- beta_aux
-      p_c[pos] <- c_aux
-      p_df[pos] <- df_aux
-      p_lambda[pos] <- lambda_aux
+      p_beta[[pos]] <- beta_aux
+      if(!is.null(p_c)) p_c[[pos]] <- c_aux
+      if(!is.null(p_df)) p_df[[pos]] <- df_aux
+      if(!is.null(p_lambda)) p_lambda[[pos]] <- lambda_aux
 
-      p_prop[pos, ] <- make_p(p_c = p_c[pos], X = X, p_beta = p_beta[pos, ], p_df = p_df[pos], inv_link_f = inv_link_f)
+      p_prop[[pos]] <- make_p(p_c = c_aux, X = X, p_beta = beta_aux, p_df = df_aux, inv_link_f = inv_link_f)
+
+      invisible(gc(reset = T, verbose = FALSE, full = TRUE))
     }
   }
 

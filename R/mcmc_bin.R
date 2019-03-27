@@ -20,6 +20,7 @@
 #' @param bound_beta Limits to sample beta for ARMS
 #' @param method "metropolis" or "ARMS"
 #' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
+#' @param fitm Should return fit measures?
 #'
 #' @examples \dontrun{
 #'  set.seed(1)
@@ -113,7 +114,7 @@ mcmc_bin <- function(data, formula,
                      var_df = 0.60, var_c = 0.4, var_lambda = 2.4,
                      bound_beta = c(-10, 10),
                      method = "ARMS",
-                     const = 1){
+                     const = 1, fitm = FALSE){
 
   if(!is.data.frame(data)) stop("data must be a data.frame")
   if(burnin + nsim*lag < 1000) stop("Please consider to increase the nsim, burnin and/or lag.")
@@ -135,6 +136,7 @@ mcmc_bin <- function(data, formula,
   model_types <- attr(model_fr, "terms")
   y <- stats::model.response(model_fr, "numeric")
   X <- stats::model.matrix(model_types, model_fr)
+  rm(data)
 
   ##-- Link function
   inv_link_f <- function(x, df) inv_link(x = x, type = type, df = df)
@@ -143,13 +145,17 @@ mcmc_bin <- function(data, formula,
   n_cov <- ncol(X)
   n <- nrow(X)
 
-  p_c <- rep(0.5, nsim)
-  if(!sample_c) p_c <- rep(0, nsim)
+  p_prop <- p_beta <- p_lambda <- p_df <- vector(mode = 'list', length = nsim)
+  if(sample_c) p_c <- vector(mode = 'list', length = nsim) else p_c <- NULL
+  if(type == "robit") p_df <- vector(mode = 'list', length = nsim) else p_df <- NULL
+  if(type == "robit") p_lambda <- vector(mode = 'list', length = nsim) else p_lambda <- NULL
 
-  p_prop <- matrix(0.5, nrow = nsim, ncol = n)
-  p_beta <- matrix(0, nrow = nsim, ncol = n_cov)
-  p_df <- rep(5, nsim)
-  p_lambda <- rep(mean(c(a_lambda, b_lambda)), nsim)
+  p_prop[[1]] <- rep(0.5, n)
+  p_beta[[1]] <- rep(0, n_cov)
+
+  if(sample_c) p_c[[1]] <- ifelse(!sample_c, 0, 0.5)
+  if(type == "robit") p_lambda[[1]] <- mean(c(a_lambda, b_lambda))
+  if(type == "robit") p_df[[1]] <- 5
 
   time_1 <- Sys.time()
   if(method == "metropolis"){
@@ -164,12 +170,6 @@ mcmc_bin <- function(data, formula,
                                 p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda,
                                 const = const)
 
-    p_c <- samp$p_c
-    p_prop <- samp$p_prop
-    p_beta <- samp$p_beta
-    p_df <- samp$p_df
-    p_lambda <- samp$p_lambda
-
   } else{
     if(method == "ARMS"){
       samp <- mcmc_bin_arms(y = y, X = X,
@@ -183,27 +183,33 @@ mcmc_bin <- function(data, formula,
                             p_c = p_c, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda,
                             const = const)
 
-      p_c <- samp$p_c
-      p_prop <- samp$p_prop
-      p_beta <- samp$p_beta
-      p_df <- samp$p_df
-      p_lambda <- samp$p_lambda
-
     } else{
       stop(paste("The", method, "algorithm is not implemented."))
     }
   }
+
+  samp$p_prop <- do.call(args = samp$p_prop, what = "rbind")
+  samp$p_beta <- do.call(args = samp$p_beta, what = "rbind")
+  if(sample_c) samp$p_c <- do.call(args = samp$p_c, what = "c")
+  if(type == "robit") samp$p_df <- do.call(args = samp$p_df, what = "c")
+  if(type == "robit") samp$p_lambda <- do.call(args = samp$p_lambda, what = "c")
+
   time_2 <- Sys.time()
   time_elapsed <- time_2 - time_1
 
   ##-- Outputs
-  colnames(p_beta) <- colnames(X)
+  colnames(samp$p_beta) <- colnames(X)
 
-  fit <- fit_measures(y = y, p = as.matrix(p_prop))
-  if(!sample_c) p_c <- NULL
+  if(fitm){
+    fit <- fit_measures(y = y, p = as.matrix(samp$p_prop))
+  } else{
+    fit <- NULL
+  }
 
-  out <- list(p = p_prop, beta = p_beta,
-              c = p_c, df = p_df, lambda = p_lambda,
+  invisible(gc(reset = T, verbose = FALSE, full = TRUE))
+
+  out <- list(p = samp$p_prop, beta = samp$p_beta,
+              c = samp$p_c, df = samp$p_df, lambda = samp$p_lambda,
               time = time_elapsed,
               call = call_robit,
               fit_measures = fit)

@@ -52,10 +52,10 @@ mcmc_bin_arms <- function(y, X,
 
   n_cov <- ncol(X)
 
-  beta_aux <- p_beta[1, ]
-  c_aux <- p_c[1]
-  df_aux <- p_df[1]
-  lambda_aux <- p_lambda[1]
+  beta_aux <- p_beta[[1]]
+  c_aux <- ifelse(!is.null(p_c), p_c[[1]], 0)
+  if(!is.null(p_df)) df_aux <- p_df[[1]]
+  if(!is.null(p_lambda)) lambda_aux <- p_lambda[[1]]
 
   ##-- Progress bar
   pb <- progress::progress_bar$new(total = sample_size-1)
@@ -121,12 +121,14 @@ mcmc_bin_arms <- function(y, X,
     if((i-burnin)%%lag == 0 & i > burnin){
       pos <- (i-burnin)/lag
 
-      p_beta[pos, ] <- beta_aux
-      p_c[pos] <- c_aux
-      p_df[pos] <- df_aux
-      p_lambda[pos] <- lambda_aux
+      p_beta[[pos]] <- beta_aux
+      if(!is.null(p_c)) p_c[[pos]] <- c_aux
+      if(!is.null(p_df)) p_df[[pos]] <- df_aux
+      if(!is.null(p_lambda)) p_lambda[[pos]] <- lambda_aux
 
-      p_prop[pos, ] <- make_p(p_c = p_c[pos], X = X, p_beta = p_beta[pos, ], p_df = p_df[pos], inv_link_f = inv_link_f)
+      p_prop[[pos]] <- make_p(p_c = c_aux, X = X, p_beta = beta_aux, p_df = df_aux, inv_link_f = inv_link_f)
+
+      invisible(gc(reset = T, verbose = FALSE, full = TRUE))
     }
   }
 
