@@ -336,6 +336,8 @@ WAIC <- function(y, p){
 #'
 #' @param y Vector of response variable
 #' @param p Matrix of probabilities for each individual y in each MCMC iteration
+#' @param nrep Number of replications in bootstrap (null to use all data)
+#' @param nsamp Number of observation in each bootstrap realization
 #'
 #' @return measures A data.frame with LMPL, DIC and WAIC measures
 

@@ -39,7 +39,7 @@ plot.robit <- function(x, bty = "l", ask = T, ...){
 
   ##-- + Temporal parameter ----
   if(!is.null(x$df)){
-  graphics::plot(x = 1:n, y = data$df,
+  graphics::plot(x = 1:n, y = x$df,
                  col = 'grey20', type = 'l', cex = 1.5,
                  xlab = 'Iteration', ylab = 'Degrees of freedom',
                  bty = bty, ...)

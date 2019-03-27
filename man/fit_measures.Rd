@@ -10,6 +10,10 @@ fit_measures(y, p, nrep = NULL, nsamp = 100)
 \item{y}{Vector of response variable}
 
 \item{p}{Matrix of probabilities for each individual y in each MCMC iteration}
+
+\item{nrep}{Number of replications in bootstrap (null to use all data)}
+
+\item{nsamp}{Number of observation in each bootstrap realization}
 }
 \value{
 measures A data.frame with LMPL, DIC and WAIC measures
