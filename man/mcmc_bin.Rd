@@ -47,7 +47,7 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 
 \item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
 
-\item{fitm}{Should return fit measures?}
+\item{fitm}{Should return fit measures? "full" for measures based on full dataset or "bootstrap" to use a bootstrap technique}
 }
 \value{
 Chains of all parameters

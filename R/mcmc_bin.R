@@ -20,7 +20,7 @@
 #' @param bound_beta Limits to sample beta for ARMS
 #' @param method "metropolis" or "ARMS"
 #' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
-#' @param fitm Should return fit measures?
+#' @param fitm Should return fit measures? "full" for measures based on full dataset or "bootstrap" to use a bootstrap technique
 #'
 #' @examples \dontrun{
 #'  set.seed(1)
@@ -200,8 +200,9 @@ mcmc_bin <- function(data, formula,
   ##-- Outputs
   colnames(samp$p_beta) <- colnames(X)
 
-  if(fitm){
-    fit <- fit_measures(y = y, p = as.matrix(samp$p_prop))
+  if(!is.null(fitm)){
+    if(fitm == "full") nrep <- NULL else nrep <- 100
+    fit <- fit_measures(y = y, p = as.matrix(samp$p_prop), nrep = nrep, nsamp = 100)
   } else{
     fit <- NULL
   }

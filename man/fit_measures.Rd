@@ -4,7 +4,7 @@
 \alias{fit_measures}
 \title{LPML, DIC and WAIC measures}
 \usage{
-fit_measures(y, p)
+fit_measures(y, p, nrep = NULL, nsamp = 100)
 }
 \arguments{
 \item{y}{Vector of response variable}

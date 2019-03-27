@@ -285,8 +285,8 @@ LPML <- function(y, p){
   aux <- data.frame(y, t(p))
   CPO <- apply(X = aux, MARGIN = 1,
                FUN = function(x) CPO_bernoulli(y = x[1], p = x[-1]))
-  LPML <- sum(log(CPO), na.rm = T)
-  return(-2*LPML)
+  lpml <- sum(log(CPO), na.rm = T)
+  return(-2*lpml)
 }
 
 #' @title Deviance Information Criterion
@@ -307,8 +307,8 @@ DIC <- function(y, p){
   esp_log_px <- sum(esp_log_px, na.rm = T)/niter
 
   pDIC <- 2*(log_px - esp_log_px)
-  DIC <- -2*log_px + 2*pDIC
-  return(DIC)
+  dic <- -2*log_px + 2*pDIC
+  return(dic)
 }
 
 #' @title Widely Applicable Information Criterion
@@ -328,8 +328,8 @@ WAIC <- function(y, p){
   mean_log_px <- colMeans(log_px, na.rm = T)
   log_mean_px <- log(colMeans(px, na.rm = T))
   pWAIC <- 2*sum(log_mean_px - mean_log_px)
-  WAIC <- -2*(lppd - pWAIC)
-  return(WAIC)
+  waic <- -2*(lppd - pWAIC)
+  return(waic)
 }
 
 #' @title LPML, DIC and WAIC measures
@@ -339,11 +339,33 @@ WAIC <- function(y, p){
 #'
 #' @return measures A data.frame with LMPL, DIC and WAIC measures
 
-fit_measures <- function(y, p){
-  lpml <- LPML(y, p)
-  dic <- DIC(y, p)
-  waic <- WAIC(y, p)
+fit_measures <- function(y, p, nrep = NULL, nsamp = 100){
+
+  if(!is.null(nrep)){
+    n <- length(y)
+    lpml <- dic <- waic <- vector(mode = "list", length = nrep)
+
+    for(i in 1:nrep){
+      samp_pos <- sample(x = 1:n, size = nsamp, replace = TRUE)
+
+      lpml[[i]] <- LPML(y[samp_pos], p[, samp_pos])
+      dic[[i]] <- DIC(y[samp_pos], p[, samp_pos])
+      waic[[i]] <- WAIC(y[samp_pos], p[, samp_pos])
+    }
+
+    lpml <- mean(unlist(lpml))*n/nsamp
+    dic <- mean(unlist(dic))*n/nsamp
+    waic <- mean(unlist(waic))*n/nsamp
+  } else{
+    lpml <- LPML(y, p)
+    dic <- DIC(y, p)
+    waic <- WAIC(y, p)
+  }
+
+  invisible(gc(reset = TRUE, verbose = FALSE, full = TRUE))
+
   measures <- data.frame('DIC' = dic, '-2*LPML' = lpml, 'WAIC' = waic, check.names = F)
+
   return(measures = measures)
 }
 
