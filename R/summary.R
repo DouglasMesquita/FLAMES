@@ -31,64 +31,41 @@ summary.robit <- function(object, HPD = T, ...){
 
   ans$'Coeficients' <- coef_info
 
-  if(HPD){
+  if(!is.null(object[["c"]]) | !is.null(object[["df"]])){
+    other_info <- data.frame()
+
     if(!is.null(object[["c"]])){
-      hpd_c <- coda::HPDinterval(coda::as.mcmc(object$c))
-      hpd_df <- coda::HPDinterval(coda::as.mcmc(object$df))
+      mean_c <- mean(object$c)
+      sd_c <- stats::sd(object$c)
 
-      lower <- c(hpd_c[1], hpd_df[1])
-      upper <- c(hpd_c[2], hpd_df[2])
+      if(HPD){
+        interval_c <- coda::HPDinterval(coda::as.mcmc(object$c))
+      } else{
+        interval_c <- stats::quantile(x = object$c, probs = c(0.025, 0.975))
+      }
 
-      mean_vec <- c(mean(object$c), mean(object$df))
-      sd_vec <- c(stats::sd(object$c), stats::sd(object$df))
-    } else{
-      hpd_df <- coda::HPDinterval(coda::as.mcmc(object$df))
-
-      lower <- hpd_df[1]
-      upper <- hpd_df[1]
-
-      mean_vec <- mean(object$df)
-      sd_vec <- stats::sd(object$df)
+      data_c <- data.frame(mean = mean_c, sd = sd_c, lower_95 = interval_c[1], upper_95 = interval_c[2], row.names = "c parameter")
+      other_info <- rbind.data.frame(other_info, data_c)
     }
 
-    other_info <- data.frame('mean' = mean_vec,
-                             'std_error' = sd_vec,
-                             'lower_95' = lower,
-                             'upper_95' = upper)
-  } else{
-    if(!is.null(object[["c"]])){
-      quantile_c <- stats::quantile(x = object$c, probs = c(0.025, 0.975))
-      quantile_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
+    if(!is.null(object[["df"]])){
+      mean_df <- mean(object$df)
+      sd_df <- stats::sd(object$df)
 
-      lower <- c(quantile_c[1], quantile_df[1])
-      upper <- c(quantile_c[2], quantile_df[2])
+      if(HPD){
+        interval_df <- coda::HPDinterval(coda::as.mcmc(object$df))
+      } else{
+        interval_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
+      }
 
-      mean_vec <- c(mean(object$c), mean(object$df))
-      sd_vec <- c(stats::sd(object$c), stats::sd(object$df))
-    } else{
-      quantile_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
-
-      lower <- quantile_df[1]
-      upper <- quantile_df[2]
-
-      mean_vec <- mean(object$df)
-      sd_vec <- stats::sd(object$df)
+      data_df <- data.frame(mean = mean_df, sd = sd_df, lower_95 = interval_df[1], upper_95 = interval_df[2], row.names = "Degrees of freedom")
+      other_info <- rbind.data.frame(other_info, data_df)
     }
 
-    other_info <- data.frame('mean' = mean_vec,
-                             'std_error' = sd_vec,
-                             'lower_95' = lower,
-                             'upper_95' = upper)
+    ans$'Other parameters' <- other_info
   }
 
-  if(!is.null(object[["c"]])){
-    rownames(other_info) <- c("c parameter", "Degrees of freedom")
-  } else{
-    rownames(other_info) <- "Degrees of freedom"
-  }
-
-  ans$'Other parameters' <- other_info
-  ans$'Fit measures' <- object$fit_measures
+  if(!is.null( object$fit_measures)) ans$'Fit measures' <- object$fit_measures
 
   return(ans)
 }

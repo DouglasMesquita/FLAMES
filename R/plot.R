@@ -13,8 +13,6 @@
 
 plot.robit <- function(x, bty = "l", ask = T, ...){
 
-  data <- data.frame(x$beta, c = x$c, df = x$df)
-
   p <- ncol(x$beta)
   n <- nrow(x$beta)
 
@@ -26,20 +24,24 @@ plot.robit <- function(x, bty = "l", ask = T, ...){
                    col = 'grey20', type = 'l', cex = 1.5,
                    xlab = xlab, ylab = ylab,
                    bty = bty, ...)
-    if(ask) invisible(readline(prompt = "Press [enter] to see the next plot..."))
+    if(ask & (!is.null(x$c | x$df))) invisible(readline(prompt = "Press [enter] to see the next plot..."))
   }
 
   ##-- Other parameters ----
   ##-- + c parameter ----
-  graphics::plot(x = 1:n, y = data$c,
-                 col = 'grey20', type = 'l', cex = 1.5,
-                 xlab = 'Iteration', ylab = 'c parameter',
-                 bty = bty, ...)
-  if(ask) invisible(readline(prompt = "Press [enter] to see the next plot..."))
+  if(!is.null(x$c)){
+    graphics::plot(x = 1:n, y = x$c,
+                   col = 'grey20', type = 'l', cex = 1.5,
+                   xlab = 'Iteration', ylab = 'c parameter',
+                   bty = bty, ...)
+    if(ask) invisible(readline(prompt = "Press [enter] to see the next plot..."))
+  }
 
   ##-- + Temporal parameter ----
+  if(!is.null(x$df)){
   graphics::plot(x = 1:n, y = data$df,
                  col = 'grey20', type = 'l', cex = 1.5,
                  xlab = 'Iteration', ylab = 'Degrees of freedom',
                  bty = bty, ...)
+  }
 }
