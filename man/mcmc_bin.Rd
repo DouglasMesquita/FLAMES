@@ -6,8 +6,8 @@
 \usage{
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sample_d = TRUE,
-  sigma_beta = 100, mean_c = 0.5, sd_c = 0.45, mean_d = 1,
-  sd_d = 1, a_lambda = 0.01, b_lambda = 0.99, var_df = 0.02,
+  sigma_beta = 100, mean_c = 0.5, sd_c = 0.45, mean_d = 0.5,
+  sd_d = 0.29, a_lambda = 0.01, b_lambda = 0.99, var_df = 0.02,
   var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c,
   0.005, 0.02), var_lambda = 0.05, method = "ARMS", const = 1,
   fitm = FALSE)
