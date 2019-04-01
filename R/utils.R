@@ -62,6 +62,7 @@ link <- function(x, type = "logit", df = 1){
 #' @param X Covariate matrix
 #' @param p_beta Regression coefficients
 #' @param p_c c parameter
+#' @param p_d d parameter
 #' @param p_df Degrees of freedom
 #' @param inv_link_f Inverse link function
 #' @param log For log-scale values
@@ -69,11 +70,11 @@ link <- function(x, type = "logit", df = 1){
 #' @return Likelihood value
 
 bernoulli_like <- function(y, X,
-                           p_beta, p_c, p_df,
+                           p_beta, p_c, p_d, p_df,
                            inv_link_f,
                            log = TRUE){
 
-  p <- make_p(p_c = p_c, X = X, p_beta = p_beta, p_df = p_df, inv_link_f = inv_link_f)
+  p <- make_p(p_c = p_c, p_d = p_d, X = X, p_beta = p_beta, p_df = p_df, inv_link_f = inv_link_f)
 
   if(sum(p == 1) != 0){
     p <- ifelse(p == 1, 0.999999, p)
@@ -91,7 +92,7 @@ bernoulli_like <- function(y, X,
   return(like)
 }
 
-#' @title Beta posterior distribution
+#' @title Beta full conditional distribution
 #'
 #' @param y Bernoulli observed values
 #' @param X Covariate matrix
@@ -99,6 +100,7 @@ bernoulli_like <- function(y, X,
 #' @param p_beta_element Specific coefficient element
 #' @param element Element you are sampling
 #' @param p_c c parameter
+#' @param p_d d parameter
 #' @param p_df Degrees of freedom
 #' @param inv_link_f Inverse link function
 #' @param sigma_beta Variance of beta[element] prior
@@ -107,8 +109,8 @@ bernoulli_like <- function(y, X,
 #'
 #' @return Likelihood value
 
-beta_posterior <- function(y, X,
-                           p_beta, p_beta_element, element, p_c, p_df,
+beta_fullcond <- function(y, X,
+                           p_beta, p_beta_element, element, p_c, p_d, p_df,
                            inv_link_f,
                            sigma_beta = 100,
                            log = TRUE,
@@ -120,24 +122,23 @@ beta_posterior <- function(y, X,
     p_beta[element] <- p_beta_element
   }
 
-  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_df = p_df, inv_link_f = inv_link_f, log = log)
+  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = log)
 
   post_val <- like - (1/(2*sigma_beta^2))*p_beta[element]^2                                # prior
   if(method == "ARMS")  post_val <- post_val - log(p_beta_element) - log(1-p_beta_element) # jacobian
 
-  if(!log){
-    post_val <- exp(post_val)
-  }
+  if(!log) post_val <- exp(post_val)
 
   return(post_val)
 }
 
-#' @title c posterior distribution
+#' @title c full conditional distribution
 #'
 #' @param y Bernoulli observed values
 #' @param X Covariate matrix
 #' @param p_beta Regression coefficients
 #' @param p_c c parameter
+#' @param p_d d parameter
 #' @param p_df Degrees of freedom
 #' @param inv_link_f Inverse link function
 #' @param a_c Shape1 for c prior
@@ -147,34 +148,116 @@ beta_posterior <- function(y, X,
 #'
 #' @return Likelihood value
 
-c_posterior <- function(y, X,
-                        p_beta, p_c, p_df,
+c_fullcond <- function(y, X,
+                        p_beta, p_c, p_d, p_df,
                         inv_link_f,
-                        a_c = 1, b_c = 1,
+                        a_c, b_c,
                         log = TRUE, method = "ARMS"){
 
   p_c_star <- p_c
 
   if(method == "metropolis") p_c <- exp(p_c)/(1+exp(p_c))
 
-  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_df = p_df, inv_link_f = inv_link_f, log = log)
+  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = log)
 
   post_val <- like + (a_c-1)*log(p_c) + (b_c-1)*log(1-p_c)                            # prior
   if(method == "metropolis") post_val <- post_val + p_c_star - 2*log(1+exp(p_c_star)) # Jacobian
 
-  if(!log){
-    post_val <- exp(post_val)
-  }
+  if(!log) post_val <- exp(post_val)
 
   return(post_val)
 }
 
-#' @title Degree of freedom posterior distribution
+#' @title d full conditional distribution
 #'
 #' @param y Bernoulli observed values
 #' @param X Covariate matrix
 #' @param p_beta Regression coefficients
 #' @param p_c c parameter
+#' @param p_d d parameter
+#' @param p_df Degrees of freedom
+#' @param inv_link_f Inverse link function
+#' @param a_d Shape1 for d prior
+#' @param b_d Shape2 for d prior
+#' @param log For log-scale values
+#' @param method "ARMS" or "metropolis"
+#'
+#' @return Likelihood value
+
+d_fullcond <- function(y, X,
+                        p_beta, p_c, p_d, p_df,
+                        inv_link_f,
+                        a_d, b_d,
+                        log = TRUE, method = "ARMS"){
+
+  p_d_star <- p_d
+
+  if(method == "metropolis") p_d <- exp(p_d)/(1+exp(p_d))
+
+  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = log)
+
+  if(p_c < p_d){
+    post_val <- like + (a_d-1)*log(p_d) + (b_d-1)*log(1-p_d)                            # prior
+  } else{
+    post_val <- -Inf
+  }
+
+  if(method == "metropolis") post_val <- post_val + p_d_star - 2*log(1+exp(p_d_star)) # Jacobian
+
+  if(!log) post_val <- exp(post_val)
+
+  return(post_val)
+}
+
+#' @title c and d joint full conditional distribution
+#'
+#' @param y Bernoulli observed values
+#' @param X Covariate matrix
+#' @param p_beta Regression coefficients
+#' @param p_c c parameter
+#' @param p_d d parameter
+#' @param p_df Degrees of freedom
+#' @param inv_link_f Inverse link function
+#' @param a_c Shape1 for c prior
+#' @param b_c Shape2 for c prior
+#' @param a_d Shape1 for d prior
+#' @param b_d Shape2 for d prior
+#' @param log For log-scale values
+#' @param method "ARMS" or "metropolis"
+#'
+#' @return Likelihood value
+
+cd_fullcond <- function(y, X,
+                        p_beta, p_c, p_d, p_df,
+                        inv_link_f,
+                        a_c, b_c ,
+                        a_d, b_d,
+                        log = TRUE, method = "ARMS"){
+
+  if(!is.nan(p_c) & !is.nan(p_d)){
+    like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = log)
+
+    prior_d <- dtbeta(x = p_d, a = a_d, b = b_d, truncA = p_c, truncB = 1, log = TRUE)
+    prior_c <- (a_c-1)*log(p_c) + (b_c-1)*log(1-p_c)
+
+    post_val <- like + prior_c + prior_d
+
+  } else{
+    post_val <- -log(.Machine$double.xmax)
+  }
+
+  if(!log) post_val <- exp(post_val)
+
+  return(post_val)
+}
+
+#' @title Degree of freedom full conditional distribution
+#'
+#' @param y Bernoulli observed values
+#' @param X Covariate matrix
+#' @param p_beta Regression coefficients
+#' @param p_c c parameter
+#' @param p_d d parameter
 #' @param p_df Degrees of freedom
 #' @param p_lambda Lambda hyperparameter for p_df
 #' @param inv_link_f Inverse link function
@@ -184,33 +267,25 @@ c_posterior <- function(y, X,
 #'
 #' @return Likelihood value
 
-df_posterior <- function(y, X,
-                         p_beta,  p_c, p_df, p_lambda,
+df_fullcond <- function(y, X,
+                         p_beta,  p_c, p_d, p_df, p_lambda,
                          inv_link_f,
                          log = TRUE, method = "ARMS", const){
 
   p_df_star <- p_df
+  p_df <- -const*log(1-p_df)
 
-  if(method == "ARMS"){
-    p_df <- -const*log(1-p_df)
-  } else{
-    p_df <- exp(p_df)/const
-  }
-
-  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_df = p_df, inv_link_f = inv_link_f, log = log)
+  like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = log)
 
   post_val <- like - (p_lambda*p_df)                                              # prior
-  if(method == "ARMS") post_val <- post_val + log(const) - log(1-p_df_star)       # jacobian
-  if(method == "metropolis") post_val <- post_val + p_df_star - log(const)        # jacobian
+  post_val <- post_val + log(const) - log(1-p_df_star)                            # jacobian
 
-  if(!log){
-    post_val <- exp(post_val)
-  }
+  if(!log) post_val <- exp(post_val)
 
   return(post_val)
 }
 
-#' @title Lambda for degree of freedom posterior distribution
+#' @title Lambda for degree of freedom full conditional distribution
 #'
 #' @param p_df Degrees of freedom
 #' @param p_lambda Lambda hyperparameter for p_df
@@ -222,7 +297,7 @@ df_posterior <- function(y, X,
 #'
 #' @return Likelihood value
 
-lambda_posterior <- function(p_df, p_lambda,
+lambda_fullcond <- function(p_df, p_lambda,
                              inv_link_f,
                              log = TRUE, method = "ARMS",
                              a_lambda = NULL, b_lambda = NULL){
@@ -233,9 +308,7 @@ lambda_posterior <- function(p_df, p_lambda,
   post_val <- log(p_lambda) - p_lambda*p_df
   if(method == "metropolis") post_val <- post_val + p_lambda_star - 2*log(1+exp(p_lambda_star)) + log(b_lambda - a_lambda) # Jacobian
 
-  if(!log){
-    post_val <- exp(post_val)
-  }
+  if(!log) post_val <- exp(post_val)
 
   return(post_val)
 }
@@ -245,14 +318,15 @@ lambda_posterior <- function(p_df, p_lambda,
 #' @param X Covariate matrix
 #' @param p_beta Coefficients
 #' @param p_c c parameter
+#' @param p_d d parameter
 #' @param p_df Degrees of freedom
 #' @param inv_link_f Inverse link function
 #'
 #' @return Likelihood value
 
-make_p <- function(X, p_beta, p_c, p_df, inv_link_f){
+make_p <- function(X, p_beta, p_c, p_d, p_df, inv_link_f){
 
-  out <- inv_link_f(x = X%*%p_beta, df = p_df)*(1-p_c) + p_c
+  out <- inv_link_f(x = X%*%p_beta, df = p_df)*(p_d-p_c) + p_c
   out <- as.numeric(out)
 
   return(out)
@@ -364,7 +438,7 @@ fit_measures <- function(y, p, nrep = NULL, nsamp = 100){
     waic <- WAIC(y, p)
   }
 
-  invisible(gc(reset = TRUE, verbose = FALSE, full = TRUE))
+  #invisible(gc(reset = TRUE, verbose = FALSE, full = TRUE))
 
   measures <- data.frame('DIC' = dic, '-2*LPML' = lpml, 'WAIC' = waic, check.names = F)
 
@@ -377,15 +451,28 @@ rtnorm <- function(n, mean, sd, truncA = -Inf, truncB = Inf){
   prob = u*(stats::pnorm(q = truncB, mean = mean, sd = sd)-
               stats::pnorm(q = truncA, mean = mean, sd = sd)) + stats::pnorm(q = truncA, mean = mean, sd = sd)
   quant <- stats::qnorm(p = prob, mean = mean, sd = sd)
+
   return(quant)
 }
-dtnorm <- function(x, mean, sd, truncA = -Inf, truncB = Inf){
-  prob <- ifelse(x < truncA | x > truncB,
+dtnorm <- function(x, mean, sd, truncA = -Inf, truncB = Inf, log = TRUE){
+  dens <- ifelse(x < truncA | x > truncB,
                  0,
                  stats::dnorm(x = x, mean = mean, sd = sd)/
                    (stats::pnorm(q = truncB, mean = mean, sd = sd) - stats::pnorm(q = truncA, mean = mean, sd = sd)))
 
-  return(prob)
+  if(log) dens <- log(dens)
+
+  return(dens)
+}
+dtbeta <- function(x, a, b, truncA = 0, truncB = 1, log = TRUE){
+  dens <- ifelse(x < truncA | x > truncB,
+                 0,
+                 stats::dbeta(x = x, shape1 = a, shape2 = b)/
+                   (stats::pbeta(q = truncB, shape1 = a, shape2 = b) - stats::pbeta(q = truncA, shape1 = a, shape2 = b)))
+
+  if(log) dens <- log(dens)
+
+  return(dens)
 }
 mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL, show_warnings = FALSE){
 
@@ -401,7 +488,7 @@ mean_sd_beta <- function(mean = NULL, sd = NULL, a = NULL, b = NULL, show_warnin
     var_lim <- mean*(1-mean)
 
     if(sd >= sqrt(var_lim)){
-      sd <- sqrt(var_lim)*0.99
+      sd <- sqrt(var_lim)
       if(show_warnings) warning(sprintf("sd must be smaller than %s. We set it as %s", round(sqrt(var_lim), 2), round(sqrt(var_lim), 2)))
     }
 

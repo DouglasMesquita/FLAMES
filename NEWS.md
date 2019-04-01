@@ -1,3 +1,4 @@
-# robit 0.1.1
+# robit 0.1.2
 
-* Using lists instead of vectors and matrix to store MCMC chains
+* Ading parameter d
+* Fixing wrong names (posterior -> full conditional)

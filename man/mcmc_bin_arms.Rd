@@ -5,8 +5,8 @@
 \title{MCMC for binary regression - ARMS version}
 \usage{
 mcmc_bin_arms(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
-  sigma_beta, a_c, b_c, a_lambda, b_lambda, bound_beta, p_c, p_prop,
-  p_beta, p_df, p_lambda, const)
+  sample_d, sigma_beta, a_c, b_c, a_d, b_d, a_lambda, b_lambda, p_c, p_d,
+  p_prop, p_beta, p_df, p_lambda, const)
 }
 \arguments{
 \item{y}{Bernoulli observed values}
@@ -25,19 +25,25 @@ mcmc_bin_arms(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
 
 \item{sample_c}{Should c be sampled?}
 
+\item{sample_d}{Should d be sampled?}
+
 \item{sigma_beta}{Variance of beta prior}
 
 \item{a_c}{Shape1 for c prior}
 
 \item{b_c}{Shape2 for c prior}
 
+\item{a_d}{Shape1 for d prior}
+
+\item{b_d}{Shape2 for d prior}
+
 \item{a_lambda}{Inferior limit for lambda}
 
 \item{b_lambda}{Superior limit for lambda}
 
-\item{bound_beta}{Limits to sample beta}
-
 \item{p_c}{To restore c}
+
+\item{p_d}{To restore d}
 
 \item{p_prop}{To restore p}
 

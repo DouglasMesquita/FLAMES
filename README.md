@@ -9,7 +9,9 @@ robit
 Overview
 --------
 
-A package to fit binary regression under several link functions and a possible cure fraction term in the form *p*<sub>*i*</sub> = *c* + (1 − *c*)*F*<sub>*v*</sub>(X*β*)
+A package to fit binary regression under several link functions and two possible fraction parameters, c and d, in the form
+
+*p*<sub>*i*</sub> = *c* + (*d* − *c*)*F*<sub>*v*</sub>(X*β*)
 
 Installation
 ------------

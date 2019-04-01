@@ -31,7 +31,7 @@ summary.robit <- function(object, HPD = T, ...){
 
   ans$'Coeficients' <- coef_info
 
-  if(!is.null(object[["c"]]) | !is.null(object[["df"]])){
+  if(!is.null(object[["c"]]) | !is.null(object[["c"]]) | !is.null(object[["df"]])){
     other_info <- data.frame()
 
     if(!is.null(object[["c"]])){
@@ -46,6 +46,20 @@ summary.robit <- function(object, HPD = T, ...){
 
       data_c <- data.frame(mean = mean_c, sd = sd_c, lower_95 = interval_c[1], upper_95 = interval_c[2], row.names = "c parameter")
       other_info <- rbind.data.frame(other_info, data_c)
+    }
+
+    if(!is.null(object[["d"]])){
+      mean_d <- mean(object$d)
+      sd_d <- stats::sd(object$d)
+
+      if(HPD){
+        interval_d <- coda::HPDinterval(coda::as.mcmc(object$d))
+      } else{
+        interval_d <- stats::quantile(x = object$d, probs = c(0.025, 0.975))
+      }
+
+      data_d <- data.frame(mean = mean_d, sd = sd_d, lower_95 = interval_d[1], upper_95 = interval_d[2], row.names = "d parameter")
+      other_info <- rbind.data.frame(other_info, data_d)
     }
 
     if(!is.null(object[["df"]])){

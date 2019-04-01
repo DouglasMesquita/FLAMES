@@ -4,7 +4,7 @@
 \alias{make_p}
 \title{Calculate p}
 \usage{
-make_p(X, p_beta, p_c, p_df, inv_link_f)
+make_p(X, p_beta, p_c, p_d, p_df, inv_link_f)
 }
 \arguments{
 \item{X}{Covariate matrix}
@@ -12,6 +12,8 @@ make_p(X, p_beta, p_c, p_df, inv_link_f)
 \item{p_beta}{Coefficients}
 
 \item{p_c}{c parameter}
+
+\item{p_d}{d parameter}
 
 \item{p_df}{Degrees of freedom}
 

@@ -5,10 +5,12 @@
 \title{MCMC for binary regression}
 \usage{
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
-  lag = 10, type = "logit", sample_c = TRUE, sigma_beta = 100,
-  mean_c = 0.5, sd_c = 0.45, a_lambda = 0.01, b_lambda = 0.99,
-  var_df = 0.6, var_c = 0.4, var_lambda = 2.4, bound_beta = c(-10,
-  10), method = "ARMS", const = 1, fitm = FALSE)
+  lag = 10, type = "logit", sample_c = TRUE, sample_d = TRUE,
+  sigma_beta = 100, mean_c = 0.5, sd_c = 0.45, mean_d = 1,
+  sd_d = 1, a_lambda = 0.01, b_lambda = 0.99, var_df = 0.02,
+  var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c,
+  0.005, 0.02), var_lambda = 0.05, method = "ARMS", const = 1,
+  fitm = FALSE)
 }
 \arguments{
 \item{data}{Dataset to be used}
@@ -25,23 +27,29 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 
 \item{sample_c}{Should c be sampled?}
 
+\item{sample_d}{Should d be sampled?}
+
 \item{sigma_beta}{Variance of beta prior}
 
 \item{mean_c}{Mean for c a priori}
 
 \item{sd_c}{Standard deviation for c a priori}
 
+\item{mean_d}{Mean for d a priori}
+
+\item{sd_d}{Standard deviation for d a priori}
+
 \item{a_lambda}{Inferior limit for lambda}
 
 \item{b_lambda}{Superior limit for lambda}
 
-\item{var_df}{Variance to sample log(df)}
+\item{var_df}{Variance to sample 1-exp(-df/const)}
 
-\item{var_c}{Variance to sample c}
+\item{var_c}{Variance to sample from c (if sample_d = TRUE) otherwise log(c/(1-c))}
+
+\item{var_d}{Variance to sample d (if sample_c = TRUE) otherwise log(c/(1-c))}
 
 \item{var_lambda}{Variance to sample lambda}
-
-\item{bound_beta}{Limits to sample beta for ARMS}
 
 \item{method}{"metropolis" or "ARMS"}
 
@@ -57,84 +65,85 @@ MCMC for binary regression
 }
 \examples{
 \dontrun{
- set.seed(1)
+##-- Seed ----
+set.seed(123456)
 
- ##-- Data ----
- n <- 1000
- n_cov <- 2
+##-- Data ----
+n <- 1000
+n_cov <- 2
 
- ##-- Covariates
- X <- matrix(rnorm(n*n_cov), ncol = n_cov)
+##-- Covariates
+X <- matrix(rnorm(n*n_cov), ncol = n_cov)
 
- ##-- Coefficients
- betas <- c(-1, 0.5)
- XBeta <- X\%*\%betas
+##-- Coefficients
+betas <- c(0, -1, 0.5)
+XBeta <- cbind(1, X)\%*\%betas
 
- ##-- c parameter
- c1 <- 0.2
- c2 <- 1 - c1
+##-- c parameter
+c1 <- 0.3
+d1 <- 1
 
- type_data = "robit"
- df <- 10
+type_data = "robit"
+df <- 10
 
- ##-- p and y
- p <- robit:::inv_link(x = XBeta, type = type_data, df = df)*c2 + c1
- y <- rbinom(n = n, size = 1, prob = p)
+##-- p and y
+p <- robit:::inv_link(x = XBeta, type = type_data, df = df)*(d1-c1) + c1
+y <- rbinom(n = n, size = 1, prob = p)
 
- bd <- data.frame(y = y, X)
+bd <- data.frame(y = y, X)
 
- ##-- Hyperparameters (prioris)
- sigma_beta <- 100
+##-- Hyperparameters (prioris)
+sigma_beta <- 100
 
- mean_c <- 0.5
- sd_c <- 0.45
+mean_c <- robit:::mean_sd_beta(a = 0.1, b = 0.1)$mean  ##-- 'Bath' beta prior
+sd_c <- robit:::mean_sd_beta(a = 0.1, b = 0.1)$sd
 
- a_lambda <- 0.01
- b_lambda <- 1.00
+mean_d <- robit:::mean_sd_beta(a = 1, b = 1)$mean      ##-- Uniform(c, 1)
+sd_d <- robit:::mean_sd_beta(a = 1, b = 1)$sd
 
- ##-- MCMC
- nsim <- 1000
- burnin <- 5000
- lag <- 10
+a_lambda <- 0.01
+b_lambda <- 0.99
 
- type <- "robit"
- bound_beta <- c(-10, 10)
- var_df <- 0.5
+##-- MCMC
+nsim <- 1000
+burnin <- 5000
+lag <- 10
 
- f <- y ~ X1 + X2
+f <- y ~ X1 + X2
+type <- "robit"
 
- ##-- ARMS ~ 3 minutes
- out_arms <- mcmc_bin(data = bd, formula = f,
+##-- ARMS ~ 4 minutes (soon in c++)
+out_arms <- mcmc_bin(data = bd, formula = f,
                      nsim = nsim, burnin = burnin, lag = lag,
-                     type = type, sample_c = TRUE,
-                     sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
+                     type = type, sample_c = TRUE, sample_d = TRUE,
+                     sigma_beta = sigma_beta,
+                     mean_c = mean_c, sd_c = sd_c, mean_d = mean_d, sd_d = sd_d,
                      a_lambda = a_lambda, b_lambda = b_lambda,
-                     var_df = var_df, bound_beta = bound_beta,
-                     method = "ARMS", const = 50)
+                     method = "ARMS", const = 50, fitm = "full")
 
- ##-- ARMS ~ 45 seconds
- out_met <- mcmc_bin(data = bd, formula = f,
+##-- ARMS ~ 55 seconds (soon in c++)
+out_met <- mcmc_bin(data = bd, formula = f,
                     nsim = nsim, burnin = burnin, lag = lag,
-                    type = type, sample_c = TRUE,
-                    sigma_beta = sigma_beta, mean_c = mean_c, sd_c = sd_c,
+                    type = type, sample_c = TRUE, sample_d = TRUE,
+                    sigma_beta = sigma_beta,
+                    mean_c = mean_c, sd_c = sd_c, mean_d = mean_d, sd_d = sd_d,
                     a_lambda = a_lambda, b_lambda = b_lambda,
-                    var_df = var_df, bound_beta = bound_beta,
-                    method = "metropolis", const = 50)
+                    method = "metropolis", const = 50, fitm = "full")
 
- ##-- GLM
- out_glm <- glm(formula = f, data = bd, family = "binomial")
+##-- GLM
+out_glm <- glm(formula = f, data = bd, family = "binomial")
 
- summary(out_glm)
- summary(out_arms)
- summary(out_met)
+summary(out_glm)
+summary(out_arms)
+summary(out_met)
 
- coef(out_glm)
- coef(out_arms)
- coef(out_met)
- betas
+coef(out_glm)
+coef(out_arms)
+coef(out_met)
+betas
 
- plot(out_arms, ask = T)
- plot(out_met, ask = T)
+plot(out_arms, ask = T)
+plot(out_met, ask = T)
 }
 
 }

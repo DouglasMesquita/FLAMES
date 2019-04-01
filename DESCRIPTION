@@ -1,7 +1,7 @@
 Package: robit
 Type: Package
 Title: Binary Regression for a New Class of Robit Link Functions
-Version: 0.1.1
+Version: 0.1.2
 Author: Douglas R. M. Azevedo, Marcos O. Prates, Renato M. Assuncao
 Maintainer: Douglas R. M. Azevedo <douglasrm.azevedo@gmail.com>
 Depends: 

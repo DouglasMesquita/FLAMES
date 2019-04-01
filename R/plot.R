@@ -37,6 +37,15 @@ plot.robit <- function(x, bty = "l", ask = T, ...){
     if(ask) invisible(readline(prompt = "Press [enter] to see the next plot..."))
   }
 
+  ##-- + d parameter ----
+  if(!is.null(x$d)){
+    graphics::plot(x = 1:n, y = x$d,
+                   col = 'grey20', type = 'l', cex = 1.5,
+                   xlab = 'Iteration', ylab = 'd parameter',
+                   bty = bty, ...)
+    if(ask) invisible(readline(prompt = "Press [enter] to see the next plot..."))
+  }
+
   ##-- + Temporal parameter ----
   if(!is.null(x$df)){
   graphics::plot(x = 1:n, y = x$df,

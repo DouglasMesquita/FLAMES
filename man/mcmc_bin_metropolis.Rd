@@ -5,8 +5,9 @@
 \title{MCMC for binary regression - Metropolis version}
 \usage{
 mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
-  sigma_beta, a_c, b_c, a_lambda, b_lambda, var_df, var_c, var_lambda, p_c,
-  p_prop, p_beta, p_df, p_lambda, const)
+  sample_d, sigma_beta, a_c, b_c, a_d, b_d, a_lambda, b_lambda, var_df,
+  var_c, var_d, var_lambda, p_c, p_d, p_prop, p_beta, p_df, p_lambda,
+  const)
 }
 \arguments{
 \item{y}{Bernoulli observed values}
@@ -25,23 +26,33 @@ mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
 
 \item{sample_c}{Should c be sampled?}
 
+\item{sample_d}{Should c be sampled?}
+
 \item{sigma_beta}{Variance of beta prior}
 
 \item{a_c}{Shape1 for c prior}
 
 \item{b_c}{Shape2 for c prior}
 
+\item{a_d}{Shape1 for d prior}
+
+\item{b_d}{Shape2 for d prior}
+
 \item{a_lambda}{Inferior limit for lambda}
 
 \item{b_lambda}{Superior limit for lambda}
 
-\item{var_df}{Variance to sample log(df)}
+\item{var_df}{Variance to sample 1-exp(-df/const)}
 
-\item{var_c}{Variance to sample c}
+\item{var_c}{Variance to sample from c (if sample_d = TRUE) otherwise log(c/(1-c))}
+
+\item{var_d}{Variance to sample d (if sample_c = TRUE) otherwise log(c/(1-c))}
 
 \item{var_lambda}{Variance to sample lambda}
 
 \item{p_c}{To restore c}
+
+\item{p_d}{To restore d}
 
 \item{p_prop}{To restore p}
 
