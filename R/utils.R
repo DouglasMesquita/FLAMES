@@ -1,7 +1,7 @@
 #' @title Inverse link function for several models (cumulative distributions)
 #'
 #' @param x Value to evaluate the cumulative distribution
-#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit", "cloglog" or "loglog"
 #' @param df Degrees of freedom (if type = "robit")
 #'
 #' @return Cumulative probability in x
@@ -23,6 +23,9 @@ inv_link <- function(x, type = "logit", df = 1){
   if(type == "cloglog"){
     cum_prob <- 1-exp(-exp(x))
   }
+  if(type == "loglog"){
+    cum_prob <- exp(-exp(x))
+  }
 
   return(cum_prob)
 }
@@ -30,7 +33,7 @@ inv_link <- function(x, type = "logit", df = 1){
 #' @title Link function for several models
 #'
 #' @param x Probability to evaluate the quantile
-#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit", "cloglog" or "loglog"
 #' @param df Degrees of freedom (if type = "robit")
 #'
 #' @return Quantile of x
@@ -51,6 +54,9 @@ link <- function(x, type = "logit", df = 1){
   }
   if(type == "cloglog"){
     quantile_x <- log(-log(1-x))
+  }
+  if(type == "loglog"){
+    quantile_x <- log(-log(x))
   }
 
   return(quantile_x)

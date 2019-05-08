@@ -23,7 +23,7 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 
 \item{lag}{Lag for MCMC}
 
-\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit", "cloglog" or "loglog"}
 
 \item{sample_c}{Should c be sampled?}
 

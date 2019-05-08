@@ -8,7 +8,7 @@
 #' @param burnin Burn in for MCMC
 #' @param lag Lag for MCMC
 #' @param inv_link_f Inverse link function
-#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit", "cloglog" or "loglog"
 #' @param sample_c Should c be sampled?
 #' @param sample_d Should c be sampled?
 #' @param sigma_beta Variance of beta prior

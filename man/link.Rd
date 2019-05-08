@@ -9,7 +9,7 @@ link(x, type = "logit", df = 1)
 \arguments{
 \item{x}{Probability to evaluate the quantile}
 
-\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit", "cloglog" or "loglog"}
 
 \item{df}{Degrees of freedom (if type = "robit")}
 }

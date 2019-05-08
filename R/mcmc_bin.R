@@ -7,7 +7,7 @@
 #' @param nsim Sample size required for MCMC
 #' @param burnin Burn in for MCMC
 #' @param lag Lag for MCMC
-#' @param type "logit", "probit", "cauchit", "robit" or "cloglog"
+#' @param type "logit", "probit", "cauchit", "robit", "cloglog" or "loglog"
 #' @param sample_c Should c be sampled?
 #' @param sample_d Should d be sampled?
 #' @param sigma_beta Variance of beta prior

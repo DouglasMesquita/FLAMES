@@ -22,7 +22,7 @@ mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
 
 \item{inv_link_f}{Inverse link function}
 
-\item{type}{"logit", "probit", "cauchit", "robit" or "cloglog"}
+\item{type}{"logit", "probit", "cauchit", "robit", "cloglog" or "loglog"}
 
 \item{sample_c}{Should c be sampled?}
 
