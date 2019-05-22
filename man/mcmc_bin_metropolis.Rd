@@ -7,7 +7,7 @@
 mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
   sample_d, sigma_beta, a_c, b_c, a_d, b_d, a_lambda, b_lambda, var_df,
   var_c, var_d, var_lambda, p_c, p_d, p_prop, p_beta, p_df, p_lambda,
-  const)
+  const, const_beta, const_c, const_d, const_df, const_lambda)
 }
 \arguments{
 \item{y}{Bernoulli observed values}
@@ -63,6 +63,16 @@ mcmc_bin_metropolis(y, X, nsim, burnin, lag, inv_link_f, type, sample_c,
 \item{p_lambda}{To restore lambda}
 
 \item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
+
+\item{const_beta}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_c}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_d}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_df}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_lambda}{A constant to tunning the acceptance rate (default = 2.38^2)}
 }
 \value{
 Chains of all parameters

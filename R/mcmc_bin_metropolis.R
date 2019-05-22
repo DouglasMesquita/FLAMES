@@ -29,6 +29,11 @@
 #' @param p_df To restore df
 #' @param p_lambda To restore lambda
 #' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
+#' @param const_beta A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_c A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_d A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_df A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_lambda A constant to tunning the acceptance rate (default = 2.38^2)
 #'
 #' @return Chains of all parameters
 #'
@@ -45,7 +50,7 @@ mcmc_bin_metropolis <- function(y, X,
                                 a_c, b_c, a_d, b_d, a_lambda, b_lambda,
                                 var_df, var_c, var_d, var_lambda,
                                 p_c, p_d, p_prop, p_beta, p_df, p_lambda,
-                                const){
+                                const, const_beta, const_c, const_d, const_df, const_lambda){
 
   sample_size <- burnin + lag*nsim
 
@@ -59,11 +64,12 @@ mcmc_bin_metropolis <- function(y, X,
 
   ##-- For adapting MCMC
   it <- 1
-  beta_adapt <- matrix(beta_aux, nrow = 100, ncol = n_cov, byrow = TRUE)
-  if(!is.null(p_c)) c_adapt <- rep(c_aux, 100)
-  if(!is.null(p_d)) d_adapt <- rep(d_aux, 100)
-  if(!is.null(p_df)) df_adapt <- rep(df_aux, 100)
-  if(!is.null(p_lambda)) lambda_adapt <- rep(lambda_aux, 100)
+  size_adapt <- 500
+  beta_adapt <- matrix(beta_aux, nrow = size_adapt, ncol = n_cov, byrow = TRUE)
+  if(!is.null(p_c)) c_adapt <- rep(c_aux, size_adapt)
+  if(!is.null(p_d)) d_adapt <- rep(d_aux, size_adapt)
+  if(!is.null(p_df)) df_adapt <- rep(df_aux, size_adapt)
+  if(!is.null(p_lambda)) lambda_adapt <- rep(lambda_aux, size_adapt)
 
   sigma_beta_met <- sqrt(diag(solve(t(X)%*%X)))
   if(!is.null(p_c)) sigma_c_met <- sqrt(var_c)
@@ -72,7 +78,7 @@ mcmc_bin_metropolis <- function(y, X,
   if(!is.null(p_lambda)) sigma_lambda_met <- sqrt(var_lambda)
 
   ##-- Stop points
-  stop_pts <- seq(100, max(1000, burnin), 100)
+  stop_pts <- seq(100, sample_size, size_adapt)
   pb <- progress::progress_bar$new(total = sample_size-1)
 
   ##-- Loop ----
@@ -81,11 +87,11 @@ mcmc_bin_metropolis <- function(y, X,
 
     ##-- Regression coefficients
     if(i %in% stop_pts){
-      sigma_beta_met <- sqrt(diag(stats::var(beta_adapt))) + 1e-05
-      if(!is.null(p_c)) sigma_c_met <- stats::sd(c_adapt) + 1e-05
-      if(!is.null(p_d)) sigma_d_met <- stats::sd(d_adapt) + 1e-05
-      if(!is.null(p_df)) sigma_df_met <- stats::sd(df_adapt) + 1e-05
-      if(!is.null(p_lambda)) sigma_lambda_met <- stats::sd(lambda_adapt) + 1e-05
+      sigma_beta_met <- sqrt(diag(stats::var(beta_adapt)))*const_beta + 1e-05
+      if(!is.null(p_c)) sigma_c_met <- stats::sd(c_adapt)*const_c + 1e-05
+      if(!is.null(p_d)) sigma_d_met <- stats::sd(d_adapt)*const_d + 1e-05
+      if(!is.null(p_df)) sigma_df_met <- stats::sd(df_adapt)*const_df + 1e-05
+      if(!is.null(p_lambda)) sigma_lambda_met <- stats::sd(lambda_adapt)*const_lambda + 1e-05
     }
 
     beta_at <- beta_aux

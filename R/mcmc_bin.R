@@ -23,6 +23,11 @@
 #' @param var_lambda Variance to sample lambda
 #' @param method "metropolis" or "ARMS"
 #' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
+#' @param const_beta A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_c A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_d A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_df A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_lambda A constant to tunning the acceptance rate (default = 2.38^2)
 #' @param fitm Should return fit measures? "full" for measures based on full dataset or "bootstrap" to use a bootstrap technique
 #'
 #' @examples \dontrun{
@@ -119,10 +124,11 @@ mcmc_bin <- function(data, formula,
                      a_lambda = 0.01, b_lambda = 0.99,
                      var_df = 0.02, var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c, 0.005, 0.02), var_lambda = 0.05,
                      method = "ARMS",
-                     const = 1, fitm = FALSE){
+                     const = 1, const_beta = 2.38^2, const_c = 2.38^2, const_d = 2.38^2, const_df = 2.38^2, const_lambda = 2.38^2,
+                     fitm = FALSE){
 
   if(!is.data.frame(data)) stop("data must be a data.frame")
-  if(burnin + nsim*lag < 1000) stop("Please consider to increase the nsim, burnin and/or lag")
+  #if(burnin + nsim*lag < 1000) stop("Please consider to increase the nsim, burnin and/or lag")
   if(a_lambda < 0) stop("a_lambda must be > 0")
   if(b_lambda < a_lambda) stop("a_lambda must be < b_lambda")
 
@@ -182,7 +188,8 @@ mcmc_bin <- function(data, formula,
                                 a_lambda = a_lambda, b_lambda = b_lambda,
                                 var_df = var_df, var_c = var_c, var_d = var_d, var_lambda = var_lambda,
                                 p_c = p_c, p_d = p_d, p_prop = p_prop, p_beta = p_beta, p_df = p_df, p_lambda = p_lambda,
-                                const = const)
+                                const = const,
+                                const_beta = const_beta, const_c = const_c, const_d = const_d, const_df = const_df, const_lambda = const_lambda)
 
   } else{
     if(method == "ARMS"){

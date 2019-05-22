@@ -10,7 +10,8 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   sd_d = 0.29, a_lambda = 0.01, b_lambda = 0.99, var_df = 0.02,
   var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c,
   0.005, 0.02), var_lambda = 0.05, method = "ARMS", const = 1,
-  fitm = FALSE)
+  const_beta = 2.38^2, const_c = 2.38^2, const_d = 2.38^2,
+  const_df = 2.38^2, const_lambda = 2.38^2, fitm = FALSE)
 }
 \arguments{
 \item{data}{Dataset to be used}
@@ -54,6 +55,16 @@ mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
 \item{method}{"metropolis" or "ARMS"}
 
 \item{const}{A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}}
+
+\item{const_beta}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_c}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_d}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_df}{A constant to tunning the acceptance rate (default = 2.38^2)}
+
+\item{const_lambda}{A constant to tunning the acceptance rate (default = 2.38^2)}
 
 \item{fitm}{Should return fit measures? "full" for measures based on full dataset or "bootstrap" to use a bootstrap technique}
 }

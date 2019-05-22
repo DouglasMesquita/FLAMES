@@ -2,3 +2,4 @@
 
 * Ading parameter d
 * Fixing wrong names (posterior -> full conditional)
+* Adding tunning parameter for metropolis
