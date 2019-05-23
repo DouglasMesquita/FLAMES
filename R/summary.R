@@ -31,7 +31,7 @@ summary.robit <- function(object, HPD = T, ...){
 
   ans$'Coeficients' <- coef_info
 
-  if(!is.null(object[["c"]]) | !is.null(object[["dw"]]) | !is.null(object[["df"]])){
+  if(!is.null(object[["c"]]) | !is.null(object[["d"]]) | !is.null(object[["df"]])){
     other_info <- data.frame()
 
     if(!is.null(object[["c"]])){
