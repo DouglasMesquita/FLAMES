@@ -128,6 +128,7 @@ mcmc_bin_metropolis <- function(y, X,
     ##-- c parameter
     if(sample_c & !sample_d){
       c_star <- log(c_aux/(1-c_aux))
+      c_star <- ifelse(abs(c_star) > log(.Machine$double.xmax), log(.Machine$double.xmax)*sign(c_star), c_star)
 
       post_c_current <- c_fullcond(y = y, X = X,
                                    p_beta = beta_aux, p_c = c_star, p_d = d_aux, p_df = df_aux,
@@ -137,6 +138,7 @@ mcmc_bin_metropolis <- function(y, X,
 
       ##-- + Proposal
       c_prop <- rnorm(n = 1, mean = c_star, sd = sigma_c_met)
+      c_prop <- ifelse(c_prop > log(.Machine$double.xmax), log(.Machine$double.xmax), c_prop)
 
       post_c_sampled <- c_fullcond(y = y, X = X,
                                    p_beta = beta_aux, p_c = c_prop, p_d = d_aux, p_df = df_aux,
@@ -158,6 +160,7 @@ mcmc_bin_metropolis <- function(y, X,
     ##-- d parameter
     if(sample_d & !sample_c){
       d_star <- log(d_aux/(1-d_aux))
+      d_star <- ifelse(abs(d_star) > log(.Machine$double.xmax), log(.Machine$double.xmax)*sign(d_star), d_star)
 
       post_d_current <- d_fullcond(y = y, X = X,
                                    p_beta = beta_aux, p_c = c_aux, p_d = d_star, p_df = df_aux,
@@ -167,6 +170,7 @@ mcmc_bin_metropolis <- function(y, X,
 
       ##-- + Proposal
       d_prop <- rnorm(n = 1, mean = d_star, sd = sigma_d_met)
+      d_prop <- ifelse(d_prop > log(.Machine$double.xmax), log(.Machine$double.xmax), d_prop)
 
       post_d_sampled <- d_fullcond(y = y, X = X,
                                    p_beta = beta_aux, p_c = c_aux, p_d = d_prop, p_df = df_aux,
@@ -187,7 +191,6 @@ mcmc_bin_metropolis <- function(y, X,
 
     ##-- c and d parameters
     if(sample_d & sample_c){
-
       post_cd_current <- cd_fullcond(y = y, X = X,
                                      p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = df_aux,
                                      inv_link_f = inv_link_f,
