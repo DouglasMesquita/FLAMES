@@ -1,5 +1,3 @@
-# robit 0.1.2
+# FLAMES 0.1.3
 
-* Ading parameter d
-* Fixing wrong names (posterior -> full conditional)
-* Adding tunning parameter for metropolis
+* New package name
