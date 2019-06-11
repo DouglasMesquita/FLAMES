@@ -1,13 +1,13 @@
-#' Coefficients for robit class
+#' Coefficients for FLAMES class
 #'
-#' @param object robit object to restore the coefficients
+#' @param object FLAMES object to restore the coefficients
 #' @param ... Other parameters for coef
 #'
-#' @method coef robit
+#' @method coef FLAMES
 #'
 #' @export
 
-coef.robit <- function(object, ...){
+coef.FLAMES <- function(object, ...){
   coefficients <- colMeans(object$beta)
   return(coefficients)
 }

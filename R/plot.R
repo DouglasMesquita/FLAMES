@@ -1,17 +1,17 @@
-#' Plot for robit class
+#' Plot for FLAMES class
 #'
-#' @param x robit object to plot
+#' @param x FLAMES object to plot
 #' @param bty Box style
 #' @param ask To ask for next plot
 #' @param ... Other parameters for plot
 #'
-#' @method plot robit
+#' @method plot FLAMES
 #'
 #' @import coda
 #'
 #' @export
 
-plot.robit <- function(x, bty = "l", ask = T, ...){
+plot.FLAMES <- function(x, bty = "l", ask = T, ...){
 
   p <- ncol(x$beta)
   n <- nrow(x$beta)

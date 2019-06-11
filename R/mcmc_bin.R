@@ -142,7 +142,7 @@ mcmc_bin <- function(data, formula,
   b_d <- par_d$b
 
   ##-- Getting call, y and X
-  call_robit <- match.call()
+  call_FLAMES <- match.call()
 
   model_fr <- match.call(expand.dots = FALSE)
   match_strings <- match(c("formula", "data"), names(model_fr), 0L)
@@ -233,10 +233,10 @@ mcmc_bin <- function(data, formula,
   out <- list(p = samp$p_prop, beta = samp$p_beta,
               c = samp$p_c, d = samp$p_d, df = samp$p_df, lambda = samp$p_lambda,
               time = time_elapsed,
-              call = call_robit,
+              call = call_FLAMES,
               fit_measures = fit)
 
-  class(out) <- "robit"
+  class(out) <- "FLAMES"
 
   return(out)
 }

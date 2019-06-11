@@ -1,14 +1,14 @@
-#' Summary for robit class (coda is necessary)
+#' Summary for FLAMES class (coda is necessary)
 #'
-#' @param object robit object to summarise
+#' @param object FLAMES object to summarise
 #' @param HPD HPD intervals or quantiles (TRUE or FALSE)
 #' @param ... Other parameters for summary
 #'
-#' @method summary robit
+#' @method summary FLAMES
 #'
 #' @export
 
-summary.robit <- function(object, HPD = T, ...){
+summary.FLAMES <- function(object, HPD = T, ...){
 
   ans <- list()
   ans$'Call' <- object$call
