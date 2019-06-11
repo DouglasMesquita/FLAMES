@@ -1,4 +1,6 @@
 
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
 # FLAMES
 
 <!-- badges: start -->
@@ -16,7 +18,11 @@ FLAMES: Flexible Link function with AssyMptotES is a package able to fit
 binary regression under several link functions and two possible
 assymptotes parameters, c and d, in the form
 
-\[p_i = c + (d-c)F_v(\text{X}\beta)\]
+<center>
+
+![equation](http://latex.codecogs.com/gif.latex?p_i%20=%20c%20+%20\(d-c\)F_v\(%5Ctext%7BX%7D%5Cbeta\))
+
+</center>
 
 ## Installation
 
