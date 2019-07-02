@@ -39,33 +39,33 @@
 #' n_cov <- 2
 #'
 #' ##-- Covariates
-#' X <- matrix(rnorm(n*n_cov), ncol = n_cov)
+#' X <- matrix(rt(n*n_cov, df = 2.5), ncol = n_cov)
+#' X <- scale(X, scale = FALSE)
 #'
 #' ##-- Coefficients
 #' betas <- c(0, -1, 0.5)
 #' XBeta <- cbind(1, X)%*%betas
 #'
 #' ##-- c parameter
-#' c1 <- 0.3
-#' d1 <- 1
+#' c1 <- 0.25
+#' d1 <- 0.95
 #'
-#' type_data = "robit"
-#' df <- 10
+#' type_data = "cloglog"
 #'
 #' ##-- p and y
-#' p <- robit:::inv_link(x = XBeta, type = type_data, df = df)*(d1-c1) + c1
+#' p <- robit:::inv_link(x = XBeta, type = type_data)*(d1-c1) + c1
 #' y <- rbinom(n = n, size = 1, prob = p)
 #'
 #' bd <- data.frame(y = y, X)
 #'
 #' ##-- Hyperparameters (prioris)
-#' sigma_beta <- 100
+#' sigma_beta <- 3
 #'
-#' mean_c <- robit:::mean_sd_beta(a = 0.1, b = 0.1)$mean  ##-- 'Bath' beta prior
-#' sd_c <- robit:::mean_sd_beta(a = 0.1, b = 0.1)$sd
+#' mean_c <- robit:::mean_sd_beta(a = 1, b = 2)$mean
+#' sd_c <- robit:::mean_sd_beta(a = 1, b = 2)$sd
 #'
-#' mean_d <- robit:::mean_sd_beta(a = 1, b = 1)$mean      ##-- Uniform(c, 1)
-#' sd_d <- robit:::mean_sd_beta(a = 1, b = 1)$sd
+#' mean_d <- robit:::mean_sd_beta(a = 2, b = 1)$mean
+#' sd_d <- robit:::mean_sd_beta(a = 2, b = 1)$sd
 #'
 #' a_lambda <- 0.01
 #' b_lambda <- 0.99
@@ -76,9 +76,9 @@
 #' lag <- 10
 #'
 #' f <- y ~ X1 + X2
-#' type <- "robit"
+#' type <- "cloglog"
 #'
-#' ##-- ARMS ~ 4 minutes (soon in c++)
+#' ##-- ARMS
 #' out_arms <- mcmc_bin(data = bd, formula = f,
 #'                      nsim = nsim, burnin = burnin, lag = lag,
 #'                      type = type, sample_c = TRUE, sample_d = TRUE,
@@ -87,7 +87,7 @@
 #'                      a_lambda = a_lambda, b_lambda = b_lambda,
 #'                      method = "ARMS", const = 50, fitm = "full")
 #'
-#' ##-- ARMS ~ 55 seconds (soon in c++)
+#' ##-- ARMS
 #' out_met <- mcmc_bin(data = bd, formula = f,
 #'                     nsim = nsim, burnin = burnin, lag = lag,
 #'                     type = type, sample_c = TRUE, sample_d = TRUE,
@@ -118,9 +118,9 @@
 mcmc_bin <- function(data, formula,
                      nsim = 1000, burnin = round(0.1*nsim), lag = 10,
                      type = "logit", sample_c = TRUE, sample_d = TRUE,
-                     sigma_beta = 100,
-                     mean_c = 0.5, sd_c = 0.45,
-                     mean_d = 0.5, sd_d = 0.29,
+                     sigma_beta = 3,
+                     mean_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$mean, sd_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$sd,
+                     mean_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$mean, sd_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$sd,
                      a_lambda = 0.01, b_lambda = 0.99,
                      var_df = 0.02, var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c, 0.005, 0.02), var_lambda = 0.05,
                      method = "ARMS",

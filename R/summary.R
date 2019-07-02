@@ -44,7 +44,7 @@ summary.FLAMES <- function(object, HPD = T, ...){
         interval_c <- stats::quantile(x = object$c, probs = c(0.025, 0.975))
       }
 
-      data_c <- data.frame(mean = mean_c, sd = sd_c, lower_95 = interval_c[1], upper_95 = interval_c[2], row.names = "c parameter")
+      data_c <- data.frame(mean = mean_c, std_error = sd_c, lower_95 = interval_c[1], upper_95 = interval_c[2], row.names = "c parameter")
       other_info <- rbind.data.frame(other_info, data_c)
     }
 
@@ -58,7 +58,7 @@ summary.FLAMES <- function(object, HPD = T, ...){
         interval_d <- stats::quantile(x = object$d, probs = c(0.025, 0.975))
       }
 
-      data_d <- data.frame(mean = mean_d, sd = sd_d, lower_95 = interval_d[1], upper_95 = interval_d[2], row.names = "d parameter")
+      data_d <- data.frame(mean = mean_d, std_error = sd_d, lower_95 = interval_d[1], upper_95 = interval_d[2], row.names = "d parameter")
       other_info <- rbind.data.frame(other_info, data_d)
     }
 
@@ -72,7 +72,7 @@ summary.FLAMES <- function(object, HPD = T, ...){
         interval_df <- stats::quantile(x = object$df, probs = c(0.025, 0.975))
       }
 
-      data_df <- data.frame(mean = mean_df, sd = sd_df, lower_95 = interval_df[1], upper_95 = interval_df[2], row.names = "Degrees of freedom")
+      data_df <- data.frame(mean = mean_df, std_error = sd_df, lower_95 = interval_df[1], upper_95 = interval_df[2], row.names = "Degrees of freedom")
       other_info <- rbind.data.frame(other_info, data_df)
     }
 
