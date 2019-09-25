@@ -68,20 +68,28 @@ mcmc_bin_arms <- function(y, X,
   for(i in 2:sample_size){
     pb$tick()
 
-    ##-- Regression coefficients
-    for(j in 1:n_cov){
-      y_start <- exp(beta_aux[j])/(1+exp(beta_aux[j]))
-      beta_aux_j <- arms(y.start = y_start,
-                         myldens = function(x) beta_fullcond(y = y, X = X,
-                                                             p_beta = beta_aux, p_beta_element = x, element = j,
-                                                             p_c = c_aux, p_d = d_aux, p_df = df_aux,
-                                                             inv_link_f = inv_link_f,
-                                                             sigma_beta = sigma_beta,
-                                                             log = TRUE, method = "ARMS"),
-                         indFunc = ind_fun_beta,
+    ##-- Robit parameters
+    if(type == "robit"){
+      ##-- lambda parameter
+      y_start <- lambda_aux
+      lambda_aux <- arms(y.start = y_start,
+                         myldens = function(x) lambda_fullcond(p_df = df_aux, p_lambda = x,
+                                                               inv_link_f = inv_link_f,
+                                                               log = TRUE),
+                         indFunc = ind_fun_lambda,
                          n.sample = 1)
 
-      beta_aux[j] <- log(beta_aux_j/(1-beta_aux_j))
+      ##-- df parameter
+      y_start <- 1-exp(-df_aux/const)
+      df_aux <- arms(y.start = y_start ,
+                     myldens = function(x) df_fullcond(y = y, X = X,
+                                                       p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = x, p_lambda = lambda_aux,
+                                                       inv_link_f = inv_link_f,
+                                                       log = TRUE, method = "ARMS", const = const),
+                     indFunc = ind_fun_df,
+                     n.sample = 1)
+
+      df_aux <- -const*log(1-df_aux)
     }
 
     ##-- c parameter
@@ -129,27 +137,20 @@ mcmc_bin_arms <- function(y, X,
       d_aux <- cd_aux[2]
     }
 
-    if(type == "robit"){
-      ##-- lambda parameter
-      y_start <- lambda_aux
-      lambda_aux <- arms(y.start = y_start,
-                         myldens = function(x) lambda_fullcond(p_df = df_aux, p_lambda = x,
-                                                               inv_link_f = inv_link_f,
-                                                               log = TRUE),
-                         indFunc = ind_fun_lambda,
+    ##-- Regression coefficients
+    for(j in 1:n_cov){
+      y_start <- exp(beta_aux[j])/(1+exp(beta_aux[j]))
+      beta_aux_j <- arms(y.start = y_start,
+                         myldens = function(x) beta_fullcond(y = y, X = X,
+                                                             p_beta = beta_aux, p_beta_element = x, element = j,
+                                                             p_c = c_aux, p_d = d_aux, p_df = df_aux,
+                                                             inv_link_f = inv_link_f,
+                                                             sigma_beta = sigma_beta,
+                                                             log = TRUE, method = "ARMS"),
+                         indFunc = ind_fun_beta,
                          n.sample = 1)
 
-      ##-- df parameter
-      y_start <- 1-exp(-df_aux/const)
-      df_aux <- arms(y.start = y_start ,
-                     myldens = function(x) df_fullcond(y = y, X = X,
-                                                       p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = x, p_lambda = lambda_aux,
-                                                       inv_link_f = inv_link_f,
-                                                       log = TRUE, method = "ARMS", const = const),
-                     indFunc = ind_fun_df,
-                     n.sample = 1)
-
-      df_aux <- -const*log(1-df_aux)
+      beta_aux[j] <- log(beta_aux_j/(1-beta_aux_j))
     }
 
     ##-- Saving the iteration i

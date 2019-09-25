@@ -171,8 +171,8 @@ mcmc_bin <- function(data, formula,
   p_prop[[1]] <- rep(0.5, n)
   p_beta[[1]] <- rep(0, n_cov)
 
-  if(sample_c) p_c[[1]] <- ifelse(!sample_c, 0, 0.2)
-  if(sample_d) p_d[[1]] <- ifelse(!sample_d, 1, 0.8)
+  if(sample_c) p_c[[1]] <- ifelse(!sample_c, 0, 0.25)
+  if(sample_d) p_d[[1]] <- ifelse(!sample_d, 1, 0.95)
   if(type == "robit") p_lambda[[1]] <- mean(c(a_lambda, b_lambda))
   if(type == "robit") p_df[[1]] <- 10
 

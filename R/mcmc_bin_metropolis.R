@@ -85,7 +85,6 @@ mcmc_bin_metropolis <- function(y, X,
   for(i in 2:sample_size){
     pb$tick()
 
-    ##-- Regression coefficients
     if(i %in% stop_pts){
       aux <- which(i == stop_pts) + 1
 
@@ -96,140 +95,7 @@ mcmc_bin_metropolis <- function(y, X,
       if(!is.null(p_lambda)) sigma_lambda_met <- sigma_lambda_met*(aux-1)/aux + stats::sd(lambda_adapt)/aux
     }
 
-    beta_at <- beta_aux
-    for(j in 1:n_cov){
-      post_beta_current <- beta_fullcond(y = y, X = X,
-                                         p_beta = beta_at, p_beta_element = beta_at[j], element = j,
-                                         p_c = c_aux, p_d = d_aux, p_df = df_aux,
-                                         inv_link_f = inv_link_f,
-                                         sigma_beta = sigma_beta,
-                                         log = TRUE, method = "metropolis")
-
-      ##-- + Proposal
-      beta_prop <- stats::rnorm(n = 1, mean = beta_at[j], sd = sigma_beta_met[j]*const_beta)
-      beta_at[j] <- beta_prop
-
-      post_beta_sampled <- beta_fullcond(y = y, X = X,
-                                         p_beta = beta_at, p_beta_element = beta_at[j], element = j,
-                                         p_c = c_aux, p_d = d_aux, p_df = df_aux,
-                                         inv_link_f = inv_link_f,
-                                         sigma_beta = sigma_beta,
-                                         log = TRUE, method = "metropolis")
-
-      ##-- + Metropolis step
-      metropolis <- exp(post_beta_sampled - post_beta_current)
-      unif_val <- stats::runif(n = 1, min = 0, max = 1)
-
-      if(metropolis > unif_val){
-        beta_aux[j] <- beta_prop
-      } else{
-        beta_at[j] <- beta_aux[j]
-      }
-    }
-
-    ##-- c parameter
-    if(sample_c & !sample_d){
-
-      c_star <- log(c_aux/(1-c_aux))
-      c_star <- ifelse(c_star > 15, 15, c_star)
-
-      post_c_current <- c_fullcond(y = y, X = X,
-                                   p_beta = beta_aux, p_c = c_star, p_d = d_aux, p_df = df_aux,
-                                   inv_link_f = inv_link_f,
-                                   a_c = a_c, b_c = b_c,
-                                   log = TRUE, method = "metropolis")
-
-      ##-- + Proposal
-      c_prop <- rnorm(n = 1, mean = c_star, sd = sigma_c_met*const_c)
-      c_prop <- ifelse(c_prop > 15, 15, c_prop)
-
-      post_c_sampled <- c_fullcond(y = y, X = X,
-                                   p_beta = beta_aux, p_c = c_prop, p_d = d_aux, p_df = df_aux,
-                                   inv_link_f = inv_link_f,
-                                   a_c = a_c, b_c = b_c,
-                                   log = TRUE, method = "metropolis")
-
-      ##-- + Metropolis step
-      metropolis <- exp(post_c_sampled - post_c_current)
-
-      if(is.nan(metropolis)) metropolis <- 0
-      unif_val <- stats::runif(n = 1, min = 0, max = 1)
-
-      if(metropolis > unif_val){
-        c_aux <- exp(c_prop)/(1+exp(c_prop))
-      }
-    }
-
-    ##-- d parameter
-    if(sample_d & !sample_c){
-      d_star <- log(d_aux/(1-d_aux))
-      d_star <- ifelse(d_star > 15, 15, d_star)
-
-      post_d_current <- d_fullcond(y = y, X = X,
-                                   p_beta = beta_aux, p_c = c_aux, p_d = d_star, p_df = df_aux,
-                                   inv_link_f = inv_link_f,
-                                   a_d = a_d, b_d = b_d,
-                                   log = TRUE, method = "metropolis")
-
-      ##-- + Proposal
-      d_prop <- rnorm(n = 1, mean = d_star, sd = sigma_d_met*const_d)
-      d_prop <- ifelse(d_prop > 15, 15, d_prop)
-
-      post_d_sampled <- d_fullcond(y = y, X = X,
-                                   p_beta = beta_aux, p_c = c_aux, p_d = d_prop, p_df = df_aux,
-                                   inv_link_f = inv_link_f,
-                                   a_d = a_d, b_d = b_d,
-                                   log = TRUE, method = "metropolis")
-
-      ##-- + Metropolis step
-      metropolis <- exp(post_d_sampled - post_d_current)
-
-      if(is.nan(metropolis)) metropolis <- 0
-      unif_val <- stats::runif(n = 1, min = 0, max = 1)
-
-      if(metropolis > unif_val){
-        d_aux <- exp(d_prop)/(1+exp(d_prop))
-      }
-    }
-
-    ##-- c and d parameters
-    if(sample_d & sample_c){
-      post_cd_current <- cd_fullcond(y = y, X = X,
-                                     p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = df_aux,
-                                     inv_link_f = inv_link_f,
-                                     a_c = a_c, b_c = b_c,
-                                     a_d = a_d, b_d = b_d,
-                                     log = TRUE, method = "metropolis")
-
-      ##-- + Proposal
-      lim_cd <- c(0.0001, 0.9999)
-      c_prop <- rtnorm(n = 1, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
-      d_prop <- rtnorm(n = 1, mean = d_aux, sd = sigma_d_met*const_d, truncA = c_prop, truncB = lim_cd[2])
-
-      dens1c <- dtnorm(x = c_aux, mean = c_prop, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
-      dens2c <- dtnorm(x = c_prop, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
-      dens1d <- dtnorm(x = d_aux, mean = d_prop, sd = sigma_d_met*const_d, truncA = c_aux, truncB = lim_cd[2])
-      dens2d <- dtnorm(x = d_prop, mean = d_aux, sd = sigma_d_met*const_d, truncA = c_prop, truncB = lim_cd[2])
-
-      post_cd_sampled <- cd_fullcond(y = y, X = X,
-                                     p_beta = beta_aux, p_c = c_prop, p_d = d_prop, p_df = df_aux,
-                                     inv_link_f = inv_link_f,
-                                     a_c = a_c, b_c = b_c,
-                                     a_d = a_d, b_d = b_d,
-                                     log = TRUE, method = "metropolis")
-
-      ##-- + Metropolis step
-      metropolis <- exp(post_cd_sampled - post_cd_current + dens1c + dens1d - dens2c - dens2d)
-
-      if(is.nan(metropolis)) metropolis <- 0
-      unif_val <- stats::runif(n = 1, min = 0, max = 1)
-
-      if(metropolis > unif_val){
-        c_aux <- c_prop
-        d_aux <- d_prop
-      }
-    }
-
+    ##-- Robit parameters
     if(type == "robit"){
       ##-- lambda parameter
       lambda_01 <- (lambda_aux-a_lambda)/(b_lambda-a_lambda)
@@ -279,6 +145,147 @@ mcmc_bin_metropolis <- function(y, X,
 
       if(metropolis > unif_val){
         df_aux <- -const*log(1-df_prop)
+      }
+    }
+
+    ##-- c parameter
+    if(sample_c & !sample_d){
+
+      c_star <- log(c_aux/(1-c_aux))
+      c_star <- ifelse(abs(c_star) > 15, 15, c_star)
+
+      post_c_current <- c_fullcond(y = y, X = X,
+                                   p_beta = beta_aux, p_c = c_star, p_d = d_aux, p_df = df_aux,
+                                   inv_link_f = inv_link_f,
+                                   a_c = a_c, b_c = b_c,
+                                   log = TRUE, method = "metropolis")
+
+      ##-- + Proposal
+      c_prop <- rnorm(n = 1, mean = c_star, sd = sigma_c_met*const_c)
+      c_prop <- ifelse(abs(c_prop) > 15, 15, c_prop)
+
+      post_c_sampled <- c_fullcond(y = y, X = X,
+                                   p_beta = beta_aux, p_c = c_prop, p_d = d_aux, p_df = df_aux,
+                                   inv_link_f = inv_link_f,
+                                   a_c = a_c, b_c = b_c,
+                                   log = TRUE, method = "metropolis")
+
+      ##-- + Metropolis step
+      metropolis <- exp(post_c_sampled - post_c_current)
+
+      if(is.nan(metropolis)) metropolis <- 0
+      unif_val <- stats::runif(n = 1, min = 0, max = 1)
+
+      if(metropolis > unif_val){
+        c_aux <- exp(c_prop)/(1+exp(c_prop))
+      }
+    }
+
+    ##-- d parameter
+    if(sample_d & !sample_c){
+      d_star <- log(d_aux/(1-d_aux))
+      d_star <- ifelse(abs(d_star) > 15, 15, d_star)
+
+      post_d_current <- d_fullcond(y = y, X = X,
+                                   p_beta = beta_aux, p_c = c_aux, p_d = d_star, p_df = df_aux,
+                                   inv_link_f = inv_link_f,
+                                   a_d = a_d, b_d = b_d,
+                                   log = TRUE, method = "metropolis")
+
+      ##-- + Proposal
+      d_prop <- rnorm(n = 1, mean = d_star, sd = sigma_d_met*const_d)
+      d_prop <- ifelse(abs(d_prop) > 15, 15, d_prop)
+
+      post_d_sampled <- d_fullcond(y = y, X = X,
+                                   p_beta = beta_aux, p_c = c_aux, p_d = d_prop, p_df = df_aux,
+                                   inv_link_f = inv_link_f,
+                                   a_d = a_d, b_d = b_d,
+                                   log = TRUE, method = "metropolis")
+
+      ##-- + Metropolis step
+      metropolis <- exp(post_d_sampled - post_d_current)
+
+      if(is.nan(metropolis)) metropolis <- 0
+      unif_val <- stats::runif(n = 1, min = 0, max = 1)
+
+      if(metropolis > unif_val){
+        d_aux <- exp(d_prop)/(1+exp(d_prop))
+      }
+    }
+
+    ##-- c and d parameters
+    if(sample_d & sample_c){
+      post_cd_current <- cd_fullcond(y = y, X = X,
+                                     p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = df_aux,
+                                     inv_link_f = inv_link_f,
+                                     a_c = a_c, b_c = b_c,
+                                     a_d = a_d, b_d = b_d,
+                                     log = TRUE, method = "metropolis")
+
+      ##-- + Proposal
+      lim_cd <- c(0.000001, 0.999999)
+      # d_prop <- rtnorm(n = 1, mean = d_aux, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
+      # c_prop <- rtnorm(n = 1, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_prop)
+      c_prop <- rtnorm(n = 1, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
+      d_prop <- rtnorm(n = 1, mean = d_aux, sd = sigma_d_met*const_d, truncA = c_prop, truncB = lim_cd[2])
+
+      # dens1c <- dtnorm(x = c_aux, mean = c_prop, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_aux)
+      # dens2c <- dtnorm(x = c_prop, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_prop)
+      # dens1d <- dtnorm(x = d_aux, mean = d_prop, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
+      # dens2d <- dtnorm(x = d_prop, mean = d_aux, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
+      dens1c <- dtnorm(x = c_aux, mean = c_prop, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
+      dens2c <- dtnorm(x = c_prop, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
+      dens1d <- dtnorm(x = d_aux, mean = d_prop, sd = sigma_d_met*const_d, truncA = c_aux, truncB = lim_cd[2])
+      dens2d <- dtnorm(x = d_prop, mean = d_aux, sd = sigma_d_met*const_d, truncA = c_prop, truncB = lim_cd[2])
+
+      post_cd_sampled <- cd_fullcond(y = y, X = X,
+                                     p_beta = beta_aux, p_c = c_prop, p_d = d_prop, p_df = df_aux,
+                                     inv_link_f = inv_link_f,
+                                     a_c = a_c, b_c = b_c,
+                                     a_d = a_d, b_d = b_d,
+                                     log = TRUE, method = "metropolis")
+
+      ##-- + Metropolis step
+      metropolis <- exp(post_cd_sampled - post_cd_current + dens1c + dens1d - dens2c - dens2d)
+
+      if(is.nan(metropolis)) metropolis <- 0
+      unif_val <- stats::runif(n = 1, min = 0, max = 1)
+
+      if(metropolis > unif_val){
+        c_aux <- c_prop
+        d_aux <- d_prop
+      }
+    }
+
+    ##-- Regression coefficients
+    beta_at <- beta_aux
+    for(j in 1:n_cov){
+      post_beta_current <- beta_fullcond(y = y, X = X,
+                                         p_beta = beta_at, p_beta_element = beta_at[j], element = j,
+                                         p_c = c_aux, p_d = d_aux, p_df = df_aux,
+                                         inv_link_f = inv_link_f,
+                                         sigma_beta = sigma_beta,
+                                         log = TRUE, method = "metropolis")
+
+      ##-- + Proposal
+      beta_prop <- stats::rnorm(n = 1, mean = beta_at[j], sd = sigma_beta_met[j]*const_beta)
+      beta_at[j] <- beta_prop
+
+      post_beta_sampled <- beta_fullcond(y = y, X = X,
+                                         p_beta = beta_at, p_beta_element = beta_at[j], element = j,
+                                         p_c = c_aux, p_d = d_aux, p_df = df_aux,
+                                         inv_link_f = inv_link_f,
+                                         sigma_beta = sigma_beta,
+                                         log = TRUE, method = "metropolis")
+
+      ##-- + Metropolis step
+      metropolis <- exp(post_beta_sampled - post_beta_current)
+      unif_val <- stats::runif(n = 1, min = 0, max = 1)
+
+      if(metropolis > unif_val){
+        beta_aux[j] <- beta_prop
+      } else{
+        beta_at[j] <- beta_aux[j]
       }
     }
 
