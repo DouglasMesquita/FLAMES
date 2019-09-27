@@ -240,14 +240,13 @@ cd_fullcond <- function(y, X,
                         a_d, b_d,
                         log = TRUE, method = "ARMS"){
 
+  if(p_c > p_d) return(-log(.Machine$double.xmax))
+
   if(!is.nan(p_c) & !is.nan(p_d)){
     like <- bernoulli_like(y = y, X = X, p_beta = p_beta, p_c = p_c, p_d = p_d, p_df = p_df, inv_link_f = inv_link_f, log = TRUE)
 
     prior_d <- dtbeta(x = p_d, a = a_d, b = b_d, truncA = p_c, truncB = 1, log = TRUE)
     prior_c <- dbeta(x = p_c, shape1 = a_c, shape2 = b_c, log = TRUE)
-
-    # prior_c <- dtbeta(x = p_c, a = a_c, b = b_c, truncA = 0, truncB = p_d, log = TRUE)
-    # prior_d <- dbeta(x = p_d, shape1 = a_d, shape2 = b_d, log = TRUE)
 
     post_val <- like + prior_c + prior_d
 

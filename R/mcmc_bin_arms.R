@@ -75,7 +75,7 @@ mcmc_bin_arms <- function(y, X,
       lambda_aux <- arms(y.start = y_start,
                          myldens = function(x) lambda_fullcond(p_df = df_aux, p_lambda = x,
                                                                inv_link_f = inv_link_f,
-                                                               log = TRUE),
+                                                               log = TRUE, method = "ARMS"),
                          indFunc = ind_fun_lambda,
                          n.sample = 1)
 
@@ -83,7 +83,8 @@ mcmc_bin_arms <- function(y, X,
       y_start <- 1-exp(-df_aux/const)
       df_aux <- arms(y.start = y_start ,
                      myldens = function(x) df_fullcond(y = y, X = X,
-                                                       p_beta = beta_aux, p_c = c_aux, p_d = d_aux, p_df = x, p_lambda = lambda_aux,
+                                                       p_beta = beta_aux, p_c = c_aux, p_d = d_aux,
+                                                       p_df = x, p_lambda = lambda_aux,
                                                        inv_link_f = inv_link_f,
                                                        log = TRUE, method = "ARMS", const = const),
                      indFunc = ind_fun_df,
@@ -101,7 +102,7 @@ mcmc_bin_arms <- function(y, X,
                                                      p_c = x, p_d = d_aux, p_df = df_aux,
                                                      inv_link_f = inv_link_f,
                                                      a_c = a_c, b_c = b_c,
-                                                     log = TRUE),
+                                                     log = TRUE, method = "ARMS"),
                     indFunc = ind_fun_c,
                     n.sample = 1)
     }
@@ -115,7 +116,7 @@ mcmc_bin_arms <- function(y, X,
                                                      p_c = c_aux, p_d = x, p_df = df_aux,
                                                      inv_link_f = inv_link_f,
                                                      a_d = a_d, b_d = b_d,
-                                                     log = TRUE),
+                                                     log = TRUE, method = "ARMS"),
                     indFunc = ind_fun_d,
                     n.sample = 1)
     }
@@ -130,7 +131,7 @@ mcmc_bin_arms <- function(y, X,
                                                        inv_link_f = inv_link_f,
                                                        a_c = a_c, b_c = b_c,
                                                        a_d = a_d, b_d = b_d,
-                                                       log = TRUE),
+                                                       log = TRUE, method = "ARMS"),
                      indFunc = ind_fun_cd,
                      n.sample = 1)
       c_aux <- cd_aux[1]

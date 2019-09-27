@@ -1,3 +1,3 @@
-# FLAMES 0.1.3
+# FLAMES 0.1.4
 
-* New package name
+* Different priors for c and d

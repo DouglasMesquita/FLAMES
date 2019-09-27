@@ -23,27 +23,23 @@
 #' @param var_lambda Variance to sample lambda
 #' @param method "metropolis" or "ARMS"
 #' @param const A constant to help on sampling degrees of freedom \eqn{\tilde{df} = df/c}
-#' @param const_beta A constant to tunning the acceptance rate (default = 2.38^2)
-#' @param const_c A constant to tunning the acceptance rate (default = 2.38^2)
-#' @param const_d A constant to tunning the acceptance rate (default = 2.38^2)
-#' @param const_df A constant to tunning the acceptance rate (default = 2.38^2)
-#' @param const_lambda A constant to tunning the acceptance rate (default = 2.38^2)
+#' @param const_beta A constant to tunning the acceptance rate (default = 1)
+#' @param const_c A constant to tunning the acceptance rate (default = 1)
+#' @param const_d A constant to tunning the acceptance rate (default = 1)
+#' @param const_df A constant to tunning the acceptance rate (default = 1)
+#' @param const_lambda A constant to tunning the acceptance rate (default = 1)
 #' @param fitm Should return fit measures? "full" for measures based on full dataset or "bootstrap" to use a bootstrap technique
 #'
 #' @examples \dontrun{
-#' ##-- Packages ----
-#' library(FLAMES)
-#'
 #' ##-- Seed ----
-#' set.seed(1)
+#' set.seed(123456)
 #'
 #' ##-- Data ----
 #' n <- 1000
 #' n_cov <- 2
 #'
 #' ##-- Covariates
-#' X <- matrix(runif(n*n_cov, min = -15, max = 15), ncol = n_cov)
-#' X <- scale(X, scale = FALSE)
+#' X <- matrix(rnorm(n*n_cov), ncol = n_cov)
 #'
 #' ##-- Coefficients
 #' betas <- c(0, -1, 0.5)
@@ -54,7 +50,6 @@
 #' d1 <- 0.95
 #'
 #' type_data = "cloglog"
-#' df <- 100
 #'
 #' ##-- p and y
 #' p <- FLAMES:::inv_link(x = XBeta, type = type_data, df = df)*(d1-c1) + c1
@@ -62,22 +57,10 @@
 #'
 #' bd <- data.frame(y = y, X)
 #'
-#' ##-- Hyperparameters (prioris)
-#' sigma_beta <- 3
-#'
-#' mean_c <- FLAMES:::mean_sd_beta(a = 5e-10, b = 1)$mean
-#' sd_c <- FLAMES:::mean_sd_beta(a = 5e-10, b = 1)$sd
-#'
-#' mean_d <- FLAMES:::mean_sd_beta(a = 1, b = 1)$mean
-#' sd_d <- FLAMES:::mean_sd_beta(a = 1, b = 1)$sd
-#'
-#' a_lambda <- 0.01
-#' b_lambda <- 0.99
-#'
 #' ##-- MCMC
-#' nsim <- 20000
-#' burnin <- 0
-#' lag <- 1
+#' nsim <- 2000
+#' burnin <- 10000
+#' lag <- 10
 #'
 #' f <- y ~ X1 + X2
 #' type <- type_data
@@ -86,37 +69,28 @@
 #' out_arms <- mcmc_bin(data = bd, formula = f,
 #'                      nsim = nsim, burnin = burnin, lag = lag,
 #'                      type = type, sample_c = TRUE, sample_d = TRUE,
-#'                      sigma_beta = sigma_beta,
-#'                      mean_c = mean_c, sd_c = sd_c, mean_d = mean_d, sd_d = sd_d,
-#'                      a_lambda = a_lambda, b_lambda = b_lambda,
-#'                      method = "ARMS", const = 50, fitm = "full")
+#'                      method = "ARMS")
 #'
 #' ##-- ARMS ~ 55 seconds (soon in c++)
 #' out_met <- mcmc_bin(data = bd, formula = f,
 #'                     nsim = nsim, burnin = burnin, lag = lag,
 #'                     type = type, sample_c = TRUE, sample_d = TRUE,
-#'                     sigma_beta = sigma_beta,
-#'                     mean_c = mean_c, sd_c = sd_c, mean_d = mean_d, sd_d = sd_d,
-#'                     a_lambda = a_lambda, b_lambda = b_lambda,
-#'                     method = "metropolis",
-#'                     const = 50,
-#'                     const_beta = 3, const_c = 1.5, const_d = 1.5, const_df = 2.38^2, const_lambda = 2.38^2,
-#'                     fitm = "full")
+#'                     method = "metropolis")
 #'
 #' ##-- GLM
 #' out_glm <- glm(formula = f, data = bd, family = "binomial")
-#'
-#' summary(out_glm)
-#' summary(out_arms)
-#' summary(out_met)
 #'
 #' coef(out_glm)
 #' coef(out_arms)
 #' coef(out_met)
 #' betas
 #'
-#' plot(out_arms, ask = T)
-#' plot(out_met, ask = T)
+#' par(mfrow = c(2, 5))
+#' plot(out_arms, ask = F)
+#' plot(out_met, ask = F)
+#'
+#' summary(out_arms)
+#' summary(out_met)
 #' }
 #'
 #' @return Chains of all parameters
@@ -126,16 +100,15 @@ mcmc_bin <- function(data, formula,
                      nsim = 1000, burnin = round(0.1*nsim), lag = 10,
                      type = "logit", sample_c = TRUE, sample_d = TRUE,
                      sigma_beta = 3,
-                     mean_c = FLAMES:::mean_sd_beta(a = 0.05, b = 1)$mean, sd_c = FLAMES:::mean_sd_beta(a = 0.05, b = 1)$sd,
-                     mean_d = FLAMES:::mean_sd_beta(a = 1, b = 0.05)$mean, sd_d = FLAMES:::mean_sd_beta(a = 1, b = 0.05)$sd,
+                     mean_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$mean, sd_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$sd,
+                     mean_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$mean, sd_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$sd,
                      a_lambda = 0.01, b_lambda = 0.99,
                      var_df = 0.02, var_c = ifelse(sample_d, 0.005, 0.02), var_d = ifelse(sample_c, 0.005, 0.02), var_lambda = 0.05,
                      method = "ARMS",
-                     const = 1, const_beta = 2.38^2, const_c = 2.38^2, const_d = 2.38^2, const_df = 2.38^2, const_lambda = 2.38^2,
+                     const = 1, const_beta = 1, const_c = 1, const_d = 1, const_df = 1, const_lambda = 1,
                      fitm = FALSE){
 
   if(!is.data.frame(data)) stop("data must be a data.frame")
-  #if(burnin + nsim*lag < 1000) stop("Please consider to increase the nsim, burnin and/or lag")
   if(a_lambda < 0) stop("a_lambda must be > 0")
   if(b_lambda < a_lambda) stop("a_lambda must be < b_lambda")
 
@@ -178,8 +151,8 @@ mcmc_bin <- function(data, formula,
   p_prop[[1]] <- rep(0.5, n)
   p_beta[[1]] <- rep(0, n_cov)
 
-  if(sample_c) p_c[[1]] <- ifelse(!sample_c, 0, 0.25)
-  if(sample_d) p_d[[1]] <- ifelse(!sample_d, 1, 0.95)
+  if(sample_c) p_c[[1]] <- ifelse(!sample_c, 0, 0.10)
+  if(sample_d) p_d[[1]] <- ifelse(!sample_d, 1, 0.90)
   if(type == "robit") p_lambda[[1]] <- mean(c(a_lambda, b_lambda))
   if(type == "robit") p_df[[1]] <- 10
 

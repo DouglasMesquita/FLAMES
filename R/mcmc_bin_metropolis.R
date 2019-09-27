@@ -224,15 +224,9 @@ mcmc_bin_metropolis <- function(y, X,
 
       ##-- + Proposal
       lim_cd <- c(0.000001, 0.999999)
-      # d_prop <- rtnorm(n = 1, mean = d_aux, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
-      # c_prop <- rtnorm(n = 1, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_prop)
       c_prop <- rtnorm(n = 1, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
       d_prop <- rtnorm(n = 1, mean = d_aux, sd = sigma_d_met*const_d, truncA = c_prop, truncB = lim_cd[2])
 
-      # dens1c <- dtnorm(x = c_aux, mean = c_prop, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_aux)
-      # dens2c <- dtnorm(x = c_prop, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = d_prop)
-      # dens1d <- dtnorm(x = d_aux, mean = d_prop, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
-      # dens2d <- dtnorm(x = d_prop, mean = d_aux, sd = sigma_d_met*const_d, truncA = 0, truncB = lim_cd[2])
       dens1c <- dtnorm(x = c_aux, mean = c_prop, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
       dens2c <- dtnorm(x = c_prop, mean = c_aux, sd = sigma_c_met*const_c, truncA = lim_cd[1], truncB = lim_cd[2])
       dens1d <- dtnorm(x = d_aux, mean = d_prop, sd = sigma_d_met*const_d, truncA = c_aux, truncB = lim_cd[2])

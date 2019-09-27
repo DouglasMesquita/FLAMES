@@ -6,7 +6,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "man/figures/"
 )
 ```
 
@@ -22,8 +22,12 @@ knitr::opts_chunk$set(
 
 FLAMES: Flexible Link function with AssyMptotES is a package able to fit binary regression under several link functions and two possible assymptotes parameters, c and d, in the form 
 
+<!-- <center> -->
+<!-- ![equation](http://latex.codecogs.com/gif.latex?p_i%20=%20c%20+%20(d-c)F_%5Cnu(%5Ctext{X}%5Cbeta)) -->
+<!-- </center> -->
+
 <center>
-![equation](http://latex.codecogs.com/gif.latex?p_i%20=%20c%20+%20(d-c)F_v(%5Ctext{X}%5Cbeta)) 
+![chains](man/figures/gif.gif){width=80%}
 </center>
 
 ## Installation
@@ -38,6 +42,92 @@ devtools::install_github("DouglasMesquita/FLAMES")
 
 ## Usage
 
+```{r package}
+library(FLAMES)
+```
+
 `library(FLAMES)` will load **mcmc_bin**, a function to fit binary regression models. The user can choose for MCMC based on ARMS or Metropolis Hastings algorithms. Also it is possible to fit **logit**, **probit**, **cauchit**, **cloglog**, **loglog** and **robit** regressions.
 
-See `?mcmc_bin` for examples.
+```{r example, cache = TRUE}
+##-- Seed
+set.seed(123456)
+
+##-- Data
+n <- 1000
+n_cov <- 1
+
+##-- Covariates
+X <- matrix(rnorm(n*n_cov), ncol = n_cov)
+
+##-- Coefficients
+betas <- c(0, -1)
+XBeta <- cbind(1, X)%*%betas
+
+##-- c parameter
+c1 <- 0.20
+d1 <- 0.95
+
+type_data = "cloglog"
+
+##-- p and y
+p <- FLAMES:::inv_link(x = XBeta, type = type_data, df = df)*(d1-c1) + c1
+y <- rbinom(n = n, size = 1, prob = p)
+
+bd <- data.frame(y = y, X)
+
+##-- MCMC
+nsim <- 2000
+burnin <- 10000
+lag <- 10
+
+f <- y ~ X
+type <- type_data
+
+##-- ARMS ~ 4 minutes (soon in c++)
+out_arms <- mcmc_bin(data = bd, formula = f,
+                     nsim = nsim, burnin = burnin, lag = lag,
+                     type = type, sample_c = TRUE, sample_d = TRUE,
+                     method = "ARMS")
+
+##-- ARMS ~ 55 seconds (soon in c++)
+out_met <- mcmc_bin(data = bd, formula = f,
+                    nsim = nsim, burnin = burnin, lag = lag,
+                    type = type, sample_c = TRUE, sample_d = TRUE,
+                    method = "metropolis")
+
+##-- GLM
+out_glm <- glm(formula = f, data = bd, family = "binomial")
+
+```
+
+```{r coefficients}
+cbind(glm = coef(out_glm),
+      arms = coef(out_arms),
+      metropolis = coef(out_met),
+      real = betas)
+```
+
+```{r plots, eval = FALSE}
+par(mfrow = c(2, 4), mar = c(3, 4, 1, 1))
+plot(out_arms, ask = F)
+plot(out_met, ask = F)
+```
+
+```{r saving plots, echo = FALSE, warning = FALSE, message = FALSE, }
+png("man/figures/chains.png", height = 400, width = 600, res = 100)
+par(mfrow = c(2, 4), mar = c(3, 4, 1, 1))
+plot(out_arms, ask = F)
+plot(out_met, ask = F)
+invisible(dev.off())
+```
+
+<center>
+![chains](man/figures/chains.png){width=80%}
+</center>
+
+```{r summary arms}
+summary(out_arms)
+```
+```{r summary metropolis}
+summary(out_met)
+```
