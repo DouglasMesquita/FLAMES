@@ -16,15 +16,9 @@ FLAMES: Flexible Link function with AssyMptotES is a package able to fit
 binary regression under several link functions and two possible
 assymptotes parameters, c and d, in the form
 
-<!-- <center> -->
-
-<!-- ![equation](http://latex.codecogs.com/gif.latex?p_i%20=%20c%20+%20(d-c)F_%5Cnu(%5Ctext{X}%5Cbeta)) -->
-
-<!-- </center> -->
-
 <center>
 
-![chains](man/figures/gif.gif)
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/gif.gif" alt="formula">
 
 </center>
 
@@ -119,7 +113,7 @@ plot(out_met, ask = F)
 
 <center>
 
-![chains](man/figures/chains.png)
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/chains.png" alt="chains" style="width:80%">
 
 </center>
 
