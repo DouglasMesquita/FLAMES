@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 FLAMES: Flexible Link function with AssyMptotES is a package able to fit binary regression under several link functions and two possible assymptotes parameters, c and d, in the form 
 
 <center>
-<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/gif.gif" alt="formula">
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/vignettes/figures/gif.gif" alt="formula">
 </center>
 
 ## Installation
@@ -110,7 +110,7 @@ plot(out_met, ask = F)
 ```
 
 ```{r saving plots, echo = FALSE, warning = FALSE, message = FALSE, }
-png("vignettes//figures/chains.png", height = 400, width = 600, res = 100)
+png("vignettes/figures/chains.png", height = 400, width = 600, res = 100)
 par(mfrow = c(2, 4), mar = c(3, 4, 1, 1))
 plot(out_arms, ask = F)
 plot(out_met, ask = F)
@@ -118,7 +118,7 @@ invisible(dev.off())
 ```
 
 <center>
-<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/chains.png" alt="chains" style="width:80%">
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/vignettes/figures/chains.png" alt="chains" style="width:80%">
 </center>
 
 ```{r summary arms}

@@ -18,7 +18,7 @@ assymptotes parameters, c and d, in the form
 
 <center>
 
-<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/gif.gif" alt="formula">
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/vignettes/figures/gif.gif" alt="formula">
 
 </center>
 
@@ -113,7 +113,7 @@ plot(out_met, ask = F)
 
 <center>
 
-<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/man/figures/chains.png" alt="chains" style="width:80%">
+<img src="https://raw.githubusercontent.com/DouglasMesquita/FLAMES/master/vignettes/figures/chains.png" alt="chains" style="width:80%">
 
 </center>
 
