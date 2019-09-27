@@ -7,5 +7,6 @@
 docs
 pkgdown/
 _pkgdown.yml
+README.Rmd
 README_cache/
 README_files/
