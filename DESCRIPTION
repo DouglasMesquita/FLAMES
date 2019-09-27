@@ -7,6 +7,7 @@ Maintainer: Douglas R. M. Azevedo <douglasrm.azevedo@gmail.com>
 Depends: 
     R (>= 3.5)
 Imports:
+    methods,
     HI, 
     progress, 
     coda
