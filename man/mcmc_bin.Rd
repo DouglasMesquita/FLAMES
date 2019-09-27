@@ -6,10 +6,10 @@
 \usage{
 mcmc_bin(data, formula, nsim = 1000, burnin = round(0.1 * nsim),
   lag = 10, type = "logit", sample_c = TRUE, sample_d = TRUE,
-  sigma_beta = 3, mean_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$mean,
-  sd_c = FLAMES:::mean_sd_beta(a = 1, b = 2)$sd,
-  mean_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$mean,
-  sd_d = FLAMES:::mean_sd_beta(a = 2, b = 1)$sd, a_lambda = 0.01,
+  sigma_beta = 3, mean_c = FLAMES:::mean_sd_beta(a = 0.05, b = 1)$mean,
+  sd_c = FLAMES:::mean_sd_beta(a = 0.05, b = 1)$sd,
+  mean_d = FLAMES:::mean_sd_beta(a = 1, b = 0.05)$mean,
+  sd_d = FLAMES:::mean_sd_beta(a = 1, b = 0.05)$sd, a_lambda = 0.01,
   b_lambda = 0.99, var_df = 0.02, var_c = ifelse(sample_d, 0.005,
   0.02), var_d = ifelse(sample_c, 0.005, 0.02), var_lambda = 0.05,
   method = "ARMS", const = 1, const_beta = 2.38^2,
@@ -79,15 +79,18 @@ MCMC for binary regression
 }
 \examples{
 \dontrun{
+##-- Packages ----
+library(FLAMES)
+
 ##-- Seed ----
-set.seed(123456)
+set.seed(1)
 
 ##-- Data ----
 n <- 1000
 n_cov <- 2
 
 ##-- Covariates
-X <- matrix(rt(n*n_cov, df = 2.5), ncol = n_cov)
+X <- matrix(runif(n*n_cov, min = -15, max = 15), ncol = n_cov)
 X <- scale(X, scale = FALSE)
 
 ##-- Coefficients
@@ -95,13 +98,14 @@ betas <- c(0, -1, 0.5)
 XBeta <- cbind(1, X)\%*\%betas
 
 ##-- c parameter
-c1 <- 0.25
+c1 <- 0.20
 d1 <- 0.95
 
 type_data = "cloglog"
+df <- 100
 
 ##-- p and y
-p <- robit:::inv_link(x = XBeta, type = type_data)*(d1-c1) + c1
+p <- FLAMES:::inv_link(x = XBeta, type = type_data, df = df)*(d1-c1) + c1
 y <- rbinom(n = n, size = 1, prob = p)
 
 bd <- data.frame(y = y, X)
@@ -109,24 +113,24 @@ bd <- data.frame(y = y, X)
 ##-- Hyperparameters (prioris)
 sigma_beta <- 3
 
-mean_c <- robit:::mean_sd_beta(a = 1, b = 2)$mean
-sd_c <- robit:::mean_sd_beta(a = 1, b = 2)$sd
+mean_c <- FLAMES:::mean_sd_beta(a = 5e-10, b = 1)$mean
+sd_c <- FLAMES:::mean_sd_beta(a = 5e-10, b = 1)$sd
 
-mean_d <- robit:::mean_sd_beta(a = 2, b = 1)$mean
-sd_d <- robit:::mean_sd_beta(a = 2, b = 1)$sd
+mean_d <- FLAMES:::mean_sd_beta(a = 1, b = 1)$mean
+sd_d <- FLAMES:::mean_sd_beta(a = 1, b = 1)$sd
 
 a_lambda <- 0.01
 b_lambda <- 0.99
 
 ##-- MCMC
-nsim <- 1000
-burnin <- 5000
-lag <- 10
+nsim <- 20000
+burnin <- 0
+lag <- 1
 
 f <- y ~ X1 + X2
-type <- "cloglog"
+type <- type_data
 
-##-- ARMS
+##-- ARMS ~ 4 minutes (soon in c++)
 out_arms <- mcmc_bin(data = bd, formula = f,
                      nsim = nsim, burnin = burnin, lag = lag,
                      type = type, sample_c = TRUE, sample_d = TRUE,
@@ -135,14 +139,17 @@ out_arms <- mcmc_bin(data = bd, formula = f,
                      a_lambda = a_lambda, b_lambda = b_lambda,
                      method = "ARMS", const = 50, fitm = "full")
 
-##-- ARMS
+##-- ARMS ~ 55 seconds (soon in c++)
 out_met <- mcmc_bin(data = bd, formula = f,
                     nsim = nsim, burnin = burnin, lag = lag,
                     type = type, sample_c = TRUE, sample_d = TRUE,
                     sigma_beta = sigma_beta,
                     mean_c = mean_c, sd_c = sd_c, mean_d = mean_d, sd_d = sd_d,
                     a_lambda = a_lambda, b_lambda = b_lambda,
-                    method = "metropolis", const = 50, fitm = "full")
+                    method = "metropolis",
+                    const = 50,
+                    const_beta = 3, const_c = 1.5, const_d = 1.5, const_df = 2.38^2, const_lambda = 2.38^2,
+                    fitm = "full")
 
 ##-- GLM
 out_glm <- glm(formula = f, data = bd, family = "binomial")
