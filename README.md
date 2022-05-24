@@ -10,6 +10,9 @@ status](https://travis-ci.org/DouglasMesquita/FLAMES.svg?branch=master)](https:/
 <!-- [![Codecov test coverage](https://codecov.io/gh/DouglasMesquita/FLAMES/branch/master/graph/badge.svg)](https://codecov.io/gh/DouglasMesquita/FLAMES?branch=master) -->
 <!-- badges: end -->
 
+## Acknowlodgment
+The authors would like to thank CAPES, CNPq and FAPEMIG for partial financial support.
+
 ## Overview
 
 FLAMES: Flexible Link function with AssyMptotES is a package able to fit
